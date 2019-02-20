@@ -3,11 +3,12 @@
     <div v-for="event in fortune" :key="event.eventDate">
       <p>{{event.eventDate}}</p>
       <p>{{event.eventPlace}}</p>
-      <table>
+      <b-table :data="toTableData(event.tickets)" :columns='members(event.tickets)' ></b-table>
+      <!-- <table>
         <tr v-for="row in toTableData(event.tickets)" :key="row[0]">
           <td v-for="data in row" :key="data">{{data}}</td>
         </tr>
-      </table>
+      </table> -->
     </div>
   </div>
 </template>
@@ -45,21 +46,29 @@ export default {
       // データ部作成
       for (const part of parts) {
         // 行の最初にpartNameを入れる
-        const row = [part]
+        const row = { '': part }
 
         for (const member of members) {
+          // その部のそのメンバーの券があるか探す
           const ticket = tickets.filter(ticket => ticket.partName === part)
             .find(ticket => ticket.memberName === member)
           if (ticket) {
-            row.push(ticket.amont)
+            row[member] = ticket.amont
           } else {
-            row.push('-')
+            row[member] = '-'
           }
         }
         table.push(row)
       }
 
       return table
+    },
+    members (tickets) {
+      return [''].concat(
+        tickets
+          .map(x => x.memberName)
+          .filter((x, i, self) => self.indexOf(x) === i))
+        .map(member => { return { field: member, label: member } })
     }
   }
 }
