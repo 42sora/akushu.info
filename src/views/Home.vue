@@ -34,22 +34,21 @@ export default {
   },
   methods: {
     toTableData (tickets) {
-      const members = tickets.map(x => x.memberName).filter((x, i, self) => self.indexOf(x) === i)
       const parts = tickets.map(x => x.partName).filter((x, i, self) => self.indexOf(x) === i).sort()
+      const members = tickets.map(x => x.memberName).filter((x, i, self) => self.indexOf(x) === i)
 
       const table = []
 
       // ヘッダー部（メンバー名）
-      table.push([''].concat(members))
+      table.push([''].concat(parts))
 
       // データ部作成
-      for (const part of parts) {
-        // 行の最初にpartNameを入れる
-        const row = [part]
+      for (const member of members) {
+        // 行の最初にmemberNameを入れる
+        const row = [member]
 
-        for (const member of members) {
-          const ticket = tickets.filter(ticket => ticket.partName === part)
-            .find(ticket => ticket.memberName === member)
+        for (const part of parts) {
+          const ticket = tickets.find(ticket => ticket.memberName === member && ticket.partName === part)
           if (ticket) {
             row.push(ticket.amont)
           } else {
