@@ -1,15 +1,22 @@
 <template>
-  <div class="home">
-    <div v-for="event in fortune" :key="event.eventDate">
+  <v-container>
+    <v-container v-for="event in fortune" :key="event.eventDate" >
       <p>{{event.eventDate}}</p>
       <p>{{event.eventPlace}}</p>
-      <table>
-        <tr v-for="row in toTableData(event.tickets)" :key="row[0]">
-          <td v-for="data in row" :key="data">{{data}}</td>
-        </tr>
-      </table>
-    </div>
-  </div>
+      <v-data-table
+      :headers="headers(event.tickets)"
+      :items="toTableData(event.tickets)"
+      class="elevation-1"
+      >
+        <template slot="items" slot-scope="props">
+          <td v-for="data in props.item"
+          :key="data"
+          class="text-xs-center"
+          >{{ data }}</td>
+        </template>
+      </v-data-table>
+    </v-container>
+  </v-container>
 </template>
 
 <script>
@@ -40,16 +47,17 @@ export default {
       const table = []
 
       // ヘッダー部（メンバー名）
-      table.push([''].concat(members))
+      // table.push([''].concat(parts))
 
       // データ部作成
-      for (const part of parts) {
+      for (const member of members) {
         // 行の最初にpartNameを入れる
-        const row = [part]
+        const row = [member]
 
-        for (const member of members) {
-          const ticket = tickets.filter(ticket => ticket.partName === part)
-            .find(ticket => ticket.memberName === member)
+        for (const part of parts) {
+          // その部のそのメンバーの券があるか探す
+          const ticket = tickets
+            .find(ticket => ticket.memberName === member && ticket.partName === part)
           if (ticket) {
             row.push(ticket.amont)
           } else {
@@ -60,12 +68,17 @@ export default {
       }
 
       return table
+    },
+    headers (tickets) {
+      return [''].concat(
+        tickets
+          .map(x => x.partName)
+          .filter((x, i, self) => self.indexOf(x) === i)
+          .sort())
+        .map(part => { return { text: part, value: part, width: 100 } })
     }
   }
 }
 </script>
 <style>
-td {
-  text-align: center;
-}
 </style>
