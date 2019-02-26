@@ -2,18 +2,16 @@
   <div class="home">
     <div v-for="event in fortune" :key="event.eventDate">
       <p>{{event.eventDate}} {{event.eventPlace}}</p>
-      <table>
-        <tr v-for="row in toTableData(event.tickets)" :key="row[0]">
-          <td v-for="data in row" :key="data">{{data}}</td>
-        </tr>
-      </table>
+      <aku-table :tickets="event.tickets"></aku-table>
     </div>
   </div>
 </template>
 
 <script>
+import AkuTable from '@/components/AkuTable'
 export default {
   name: 'home',
+  components: { AkuTable },
   computed: {
     fortune () {
       const compare = (a, b) => {
@@ -29,35 +27,6 @@ export default {
         }
       }
       return this.$store.state.fortune.slice().sort((a, b) => compare(a.eventDate, b.eventDate)).reverse()
-    }
-  },
-  methods: {
-    toTableData (tickets) {
-      const parts = tickets.map(x => x.partName).filter((x, i, self) => self.indexOf(x) === i).sort()
-      const members = tickets.map(x => x.memberName).filter((x, i, self) => self.indexOf(x) === i)
-
-      const table = []
-
-      // ヘッダー部（メンバー名）
-      table.push([''].concat(parts))
-
-      // データ部作成
-      for (const member of members) {
-        // 行の最初にmemberNameを入れる
-        const row = [member]
-
-        for (const part of parts) {
-          const ticket = tickets.find(ticket => ticket.memberName === member && ticket.partName === part)
-          if (ticket) {
-            row.push(ticket.amont)
-          } else {
-            row.push('-')
-          }
-        }
-        table.push(row)
-      }
-
-      return table
     }
   }
 }
