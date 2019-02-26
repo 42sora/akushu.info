@@ -1,8 +1,7 @@
 <template>
   <div class="home">
     <div v-for="event in fortune" :key="event.eventDate">
-      <p>{{event.eventDate}}</p>
-      <p>{{event.eventPlace}}</p>
+      <p>{{event.eventDate}} {{event.eventPlace}}</p>
       <table>
         <tr v-for="row in toTableData(event.tickets)" :key="row[0]">
           <td v-for="data in row" :key="data">{{data}}</td>
