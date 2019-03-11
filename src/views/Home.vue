@@ -1,6 +1,9 @@
 <template>
   <div class="home">
-    <div v-for="event in fortune" :key="event.eventDate">
+    <template v-for="name in members" >
+      <input type="checkbox" :value="name" :key="name" v-model="filterChecks" >{{name}}
+    </template>
+    <div v-for="event in filterd" :key="event.eventDate">
       <p>{{event.eventDate}} {{event.eventPlace}}</p>
       <aku-table :tickets="event.tickets"></aku-table>
     </div>
@@ -12,8 +15,11 @@ import AkuTable from '@/components/AkuTable'
 export default {
   name: 'home',
   components: { AkuTable },
+  data: function () {
+    return { filterChecks: [] }
+  },
   computed: {
-    fortune () {
+    origin () {
       const compare = (a, b) => {
         if (a === b) { return 0 }
         const splitedA = a.split('-').map(x => parseInt(x, 10))
@@ -26,7 +32,27 @@ export default {
           return 1
         }
       }
-      return this.$store.state.fortune.slice().sort((a, b) => compare(a.eventDate, b.eventDate)).reverse()
+      return this.$store.state.fortune
+        .slice()
+        .sort((a, b) => compare(a.eventDate, b.eventDate))
+        .reverse()
+    },
+    filterd () {
+      if (this.filterChecks.length === 0) return this.origin
+      return this.origin
+        .map(event => {
+          return {
+            'eventDate': event.eventDate,
+            'eventPlace': event.eventPlace,
+            'tickets': event.tickets.filter(ticket => this.filterChecks.includes(ticket.memberName))
+          }
+        })
+        .filter(event => event.tickets.length > 0)
+    },
+    members () {
+      return this.origin
+        .flatMap(event => event.tickets.map(x => x.memberName))
+        .filter((x, i, self) => self.indexOf(x) === i)
     }
   }
 }

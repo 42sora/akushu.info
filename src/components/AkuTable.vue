@@ -11,12 +11,20 @@
 <script>
 export default {
   props: {
-    tickets: { type: Array, required: true }
+    tickets: { type: Array, required: true },
+    filter: { type: Array, default: () => [] }
   },
   computed: {
     tableData () {
-      const parts = this.tickets.map(x => x.partName).filter((x, i, self) => self.indexOf(x) === i).sort()
-      const members = this.tickets.map(x => x.memberName).filter((x, i, self) => self.indexOf(x) === i)
+      const parts = this.tickets
+        .map(x => x.partName)
+        .filter((x, i, self) => self.indexOf(x) === i)
+        .sort()
+
+      const members = this.tickets
+        .map(x => x.memberName)
+        .filter((x, i, self) => self.indexOf(x) === i)
+        .filter(x => this.filter.length === 0 || this.filter.includes(x))
 
       const table = []
 
