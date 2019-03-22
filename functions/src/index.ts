@@ -1,6 +1,7 @@
 import * as functions from 'firebase-functions'
 import * as puppeteer from 'puppeteer'
 import * as fortune from './scraping/fortune'
+import * as aggregator from './aggregator/fortuneAggregator'
 const { PubSub } = require('@google-cloud/pubsub')
 const pubsub = new PubSub('akuu-37e4b')
 
@@ -67,6 +68,8 @@ export const subFortune = functions
     try {
       const details = await fortune.getFortune(page, messageData)
       console.info(JSON.stringify(details, undefined, 1))
+      const results = aggregator.aggregate(details)
+      console.info(JSON.stringify(results, undefined, 1))
     } catch (e) {
       console.error(e)
       throw e

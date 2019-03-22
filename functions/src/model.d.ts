@@ -4,9 +4,29 @@ interface ScrapingFortuneMessage {
   password: string
 }
 
-interface entryListData {
+interface EntryListData {
   url: string
   entryDate: string
+}
+
+interface FortuneDetail {
+  memberName: string
+  eventDate: string
+  eventPlace: string
+  partName: string
+  amont: number
+}
+
+interface FortuneAggregateResult {
+  eventDate: string
+  eventPlace: string
+  tickets: Ticket[]
+}
+
+interface Ticket {
+  memberName: string
+  partName: string
+  amont: number
 }
 
 interface A extends Element {

@@ -60,7 +60,7 @@ const getEntryListData = async (page: puppeteer.Page) => {
       const entryDateText = tr.querySelector('td:nth-child(2)')!.textContent!
       const datestr = /[0-9]{4}-[0-9]{2}-[0-9]{2}/.exec(entryDateText)![0]
 
-      const result: entryListData = {
+      const result: EntryListData = {
         url: detailPageURL,
         entryDate: datestr
       }
@@ -69,7 +69,7 @@ const getEntryListData = async (page: puppeteer.Page) => {
   )
 }
 
-const getDetails = async (page: puppeteer.Page, target: entryListData) => {
+const getDetails = async (page: puppeteer.Page, target: EntryListData) => {
   await page.goto(target.url, { waitUntil: 'domcontentloaded' })
   await logging(page)
   return (await page.evaluate(() =>
@@ -151,7 +151,7 @@ export const getFortune = async (
   const entryListData = await entryList(page)
 
   // get detail
-  const details = []
+  const details: FortuneDetail[] = []
   for (const data of entryListData) {
     await page.waitFor(1000)
     const detail = await getDetails(page, data)
