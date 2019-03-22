@@ -4,14 +4,19 @@ interface ScrapingFortuneMessage {
   password: string
 }
 
+interface entryListData {
+  url: string
+  entryDate: string
+}
+
 interface A extends Element {
   href: string
 }
 
 interface Array<T> {
-  includes(arg: string): any
+  includes(arg: string): boolean
 }
 
 interface HTMLCollectionOf<T extends Element> extends HTMLCollectionBase {
-  login_form: any
+  login_form: HTMLFormElement
 }

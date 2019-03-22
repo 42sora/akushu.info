@@ -4,31 +4,41 @@ import * as fortune from './scraping/fortune'
 const { PubSub } = require('@google-cloud/pubsub')
 const pubsub = new PubSub('akuu-37e4b')
 
+const REGION = 'asia-northeast1'
 const TOPIC_SCRAPING_FORTUNE = 'ScrapingFortune'
-
-const launchOptions = {
-  args: ['--no-sandbox']
-}
 
 let browser: puppeteer.Browser
 
+const getNewPage = async () => {
+  const launchOptions = {
+    args: ['--no-sandbox']
+  }
+
+  if (!browser) {
+    browser = await puppeteer.launch(launchOptions)
+  }
+  return browser.newPage()
+}
+
 export const startScraping = functions
-  .region('asia-northeast1')
+  .region(REGION)
+  .runWith({
+    memory: '128MB'
+  })
   .https.onRequest(async (request, response) => {
     if (request.method !== 'POST') {
       response.status(405).send()
       return
     }
-    const userID = request.body.userID
-    const email = request.body.email
-    const password = request.body.password
+    const userID: string = request.body.userID
+    const email: string = request.body.email
+    const password: string = request.body.password
     if (!userID || !email || !password) {
       response.status(400).send()
       return
     }
 
     const message: ScrapingFortuneMessage = { userID, email, password }
-    console.log(message)
 
     const dataBuffer = Buffer.from(JSON.stringify(message))
     pubsub
@@ -40,11 +50,11 @@ export const startScraping = functions
       .catch((err: any) => {
         console.error('ERROR:', err)
       })
-    response.send('Hello from Firebase!')
+    response.status(200).send({ status: 'OK' })
   })
 
-export const pubFortune = functions
-  .region('asia-northeast1')
+export const subFortune = functions
+  .region(REGION)
   .runWith({
     timeoutSeconds: 300,
     memory: '1GB'
@@ -53,12 +63,10 @@ export const pubFortune = functions
   .onPublish(async (message, context) => {
     const messageData: ScrapingFortuneMessage = message.json
 
-    if (!browser) {
-      browser = await puppeteer.launch(launchOptions)
-    }
-    const page = await browser.newPage()
+    const page = await getNewPage()
     try {
-      await fortune.getFortune(page, messageData)
+      const details = await fortune.getFortune(page, messageData)
+      console.info(JSON.stringify(details, undefined, 1))
     } catch (e) {
       console.error(e)
       throw e

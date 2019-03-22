@@ -51,7 +51,7 @@ const login = async (page: puppeteer.Page, email: string, password: string) => {
   await logging(page)
 }
 
-const getDetailURLs = async (page: puppeteer.Page) => {
+const getEntryListData = async (page: puppeteer.Page) => {
   await logging(page)
   return page.evaluate(() =>
     Array.from(document.querySelectorAll('table > tbody > tr')).map(tr => {
@@ -60,16 +60,18 @@ const getDetailURLs = async (page: puppeteer.Page) => {
       const entryDateText = tr.querySelector('td:nth-child(2)')!.textContent!
       const datestr = /[0-9]{4}-[0-9]{2}-[0-9]{2}/.exec(entryDateText)![0]
 
-      return {
+      const result: entryListData = {
         url: detailPageURL,
         entryDate: datestr
       }
+      return result
     })
   )
 }
 
-const getDetails = async (page: puppeteer.Page, target: any) => {
+const getDetails = async (page: puppeteer.Page, target: entryListData) => {
   await page.goto(target.url, { waitUntil: 'domcontentloaded' })
+  await logging(page)
   return (await page.evaluate(() =>
     Array.from(document.querySelectorAll('table > tbody > tr'))
       .slice(0, -5) // テーブルのフッター部分を除去
@@ -104,7 +106,7 @@ const getDetails = async (page: puppeteer.Page, target: any) => {
 }
 
 const entryList = async (page: puppeteer.Page) => {
-  const detailURLs = await getDetailURLs(page)
+  const entryListData = await getEntryListData(page)
   const nextPageURL = await page.evaluate(() => {
     const a: A | null = document.querySelector('p.pageNext > a')
     if (a !== null) {
@@ -116,10 +118,10 @@ const entryList = async (page: puppeteer.Page) => {
   if (nextPageURL) {
     await page.waitFor(1000)
     await page.goto(nextPageURL, { waitUntil: 'domcontentloaded' })
-    detailURLs.push(...(await entryList(page)))
+    entryListData.push(...(await entryList(page)))
   }
 
-  return detailURLs
+  return entryListData
 }
 
 export const getFortune = async (
@@ -146,15 +148,14 @@ export const getFortune = async (
   // get detai page URLs
   await page.waitFor(1000)
   await page.goto(ENTRY_LIST_URL, { waitUntil: 'domcontentloaded' })
-  const detailURLs = await entryList(page)
-  console.log(detailURLs)
+  const entryListData = await entryList(page)
 
   // get detail
   const details = []
-  for (const detailURL of detailURLs) {
+  for (const data of entryListData) {
     await page.waitFor(1000)
-    const detail = await getDetails(page, detailURL)
+    const detail = await getDetails(page, data)
     details.push(...detail)
   }
-  console.log(JSON.stringify(details, undefined, 1))
+  return details
 }
