@@ -1,7 +1,8 @@
 <template>
   <div class="home">
-    <template v-for="name in members" >
-      <input type="checkbox" :value="name" :key="name" v-model="filterChecks" >{{name}}
+    <template v-for="name in members">
+      <input type="checkbox" :value="name" :key="name" v-model="filterChecks">
+      {{name}}
     </template>
     <div v-for="event in filterd" :key="event.eventDate">
       <p>{{event.eventDate}} {{event.eventPlace}}</p>
@@ -12,6 +13,8 @@
 
 <script>
 import AkuTable from '@/components/AkuTable'
+import firebase from 'firebase'
+
 export default {
   name: 'home',
   components: { AkuTable },
@@ -42,9 +45,11 @@ export default {
       return this.origin
         .map(event => {
           return {
-            'eventDate': event.eventDate,
-            'eventPlace': event.eventPlace,
-            'tickets': event.tickets.filter(ticket => this.filterChecks.includes(ticket.memberName))
+            eventDate: event.eventDate,
+            eventPlace: event.eventPlace,
+            tickets: event.tickets.filter(ticket =>
+              this.filterChecks.includes(ticket.memberName)
+            )
           }
         })
         .filter(event => event.tickets.length > 0)
@@ -54,6 +59,16 @@ export default {
         .flatMap(event => event.tickets.map(x => x.memberName))
         .filter((x, i, self) => self.indexOf(x) === i)
     }
+  },
+  created () {
+    const db = firebase.firestore()
+    db.collection('users')
+      .doc('123')
+      .onSnapshot(snapshot => {
+        console.log(snapshot)
+        const fortune = snapshot.data().fortuneAggregateData
+        this.$store.commit('setFortune', fortune)
+      })
   }
 }
 </script>
