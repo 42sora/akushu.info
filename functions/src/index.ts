@@ -33,20 +33,22 @@ export const startScraping = functions
   .runWith({
     memory: '128MB'
   })
-  .https.onRequest(async (request, response) => {
-    if (request.method !== 'POST') {
-      response.status(405).send()
-      return
+  .https.onCall(async (data, context) => {
+    const auth = context.auth
+    if (!auth) {
+      throw new functions.https.HttpsError('permission-denied', 'faild auth')
     }
-    const userID: string = request.body.userID
-    const email: string = request.body.email
-    const password: string = request.body.password
-    if (!userID || !email || !password) {
-      response.status(400).send()
-      return
+    const email: string = data.email
+    const password: string = data.password
+    if (!email || !password) {
+      throw new functions.https.HttpsError('invalid-argument', 'bad request')
     }
 
-    const message: ScrapingFortuneMessage = { userID, email, password }
+    const message: ScrapingFortuneMessage = {
+      uid: auth.uid,
+      email: email,
+      password: password
+    }
 
     const dataBuffer = Buffer.from(JSON.stringify(message))
     pubsub
@@ -58,7 +60,7 @@ export const startScraping = functions
       .catch((err: any) => {
         console.error('ERROR:', err)
       })
-    response.status(200).send({ status: 'OK' })
+    return { status: 'OK' }
   })
 
 export const subFortune = functions
@@ -79,7 +81,7 @@ export const subFortune = functions
       console.info(JSON.stringify(results, undefined, 1))
       await db
         .collection('users')
-        .doc(messageData.userID)
+        .doc(messageData.uid)
         .set({ fortuneAggregateData: results }, { merge: true })
     } catch (e) {
       console.error(e)

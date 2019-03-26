@@ -1,5 +1,5 @@
 interface ScrapingFortuneMessage {
-  userID: string
+  uid: string
   email: string
   password: string
 }
