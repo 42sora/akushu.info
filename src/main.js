@@ -22,7 +22,10 @@ firebase.auth().onAuthStateChanged((user) => {
   console.log(user)
   if (user) {
     store.commit('signIn', {
-      user: { uid: user.uid, refreshToken: user.refreshToken }
+      user: {
+        uid: user.uid,
+        idToken: user.getIdToken(false)
+      }
     })
   } else {
     store.commit('signOut')
