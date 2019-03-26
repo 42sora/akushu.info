@@ -1,6 +1,14 @@
 <template>
   <div class="home">
-    <p @click="logout">logout</p>
+    <p @click="signOut">logout</p>
+    <div>
+      <p>fortune music</p>
+      <p>メールアドレス</p>
+      <input type="text" v-model="fortune.email">
+      <p>パスワード</p>
+      <input type="password" v-model="fortune.password">
+      <p @click="startScrapping">login</p>
+    </div>
     <template v-for="name in members">
       <input type="checkbox" :value="name" :key="name" v-model="filterChecks">
       {{name}}
@@ -20,9 +28,18 @@ export default {
   name: 'home',
   components: { AkuTable },
   data: function () {
-    return { filterChecks: [] }
+    return {
+      filterChecks: [],
+      fortune: {
+        name: '',
+        password: ''
+      }
+    }
   },
   computed: {
+    user () {
+      return this.$store.state.user
+    },
     origin () {
       const compare = (a, b) => {
         if (a === b) { return 0 }
@@ -62,15 +79,31 @@ export default {
     }
   },
   methods: {
-    async logout () {
+    async signOut () {
       await firebase.auth().signOut()
       this.$router.push('/signin')
+    },
+    async startScrapping () {
+      const email = this.fortune.email
+      if (!email) {
+        alert('メールアドレスを入力してください。')
+        return
+      }
+
+      const password = this.fortune.password
+      if (!password) {
+        alert('パスワードを入力してください。')
+        return
+      }
+      const startScraping = firebase.app().functions('asia-northeast1').httpsCallable('startScraping')
+      const res = await startScraping({ email, password })
+      console.log(res)
     }
   },
   created () {
     const db = firebase.firestore()
     db.collection('users')
-      .doc('123')
+      .doc(this.user.uid)
       .onSnapshot(snapshot => {
         console.log(snapshot)
         const fortune = snapshot.data().fortuneAggregateData

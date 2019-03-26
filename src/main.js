@@ -23,8 +23,7 @@ firebase.auth().onAuthStateChanged((user) => {
   if (user) {
     store.commit('signIn', {
       user: {
-        uid: user.uid,
-        idToken: user.getIdToken(false)
+        uid: user.uid
       }
     })
   } else {
