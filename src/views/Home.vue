@@ -1,5 +1,6 @@
 <template>
   <div class="home">
+    <p @click="logout">logout</p>
     <template v-for="name in members">
       <input type="checkbox" :value="name" :key="name" v-model="filterChecks">
       {{name}}
@@ -58,6 +59,12 @@ export default {
       return this.origin
         .flatMap(event => event.tickets.map(x => x.memberName))
         .filter((x, i, self) => self.indexOf(x) === i)
+    }
+  },
+  methods: {
+    async logout () {
+      await firebase.auth().signOut()
+      this.$router.push('/signin')
     }
   },
   created () {

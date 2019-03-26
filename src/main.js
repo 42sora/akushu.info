@@ -17,6 +17,18 @@ firebase.initializeApp(config)
 
 Vue.config.productionTip = false
 
+// ここに書くのは適切ではない気がする
+firebase.auth().onAuthStateChanged((user) => {
+  console.log(user)
+  if (user) {
+    store.commit('signIn', {
+      user: { uid: user.uid, refreshToken: user.refreshToken }
+    })
+  } else {
+    store.commit('signOut')
+  }
+})
+
 new Vue({
   router,
   store,

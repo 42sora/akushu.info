@@ -5,11 +5,20 @@ Vue.use(Vuex)
 
 export default new Vuex.Store({
   state: {
+    user: { uid: null, refreshToken: null },
     fortune: []
   },
   mutations: {
     setFortune (state, fortune) {
       state.fortune = fortune
+    },
+    signIn (state, payload) {
+      console.log('commit:signIn')
+      state.user = payload.user
+    },
+    signOut (state) {
+      console.log('commit:signOut')
+      state.user = { uid: null, refreshToken: null }
     }
   },
   actions: {}
