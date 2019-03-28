@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "serve": "vue-cli-service serve",
-    "build": "vue-cli-service build",
+    "build": "vue-cli-service build --modern",
     "lint": "vue-cli-service lint",
     "deploy": "npm run build && firebase deploy --only hosting",
-    "deployfun": "npm --prefix ./functions run deploy"
+    "deployfun": "npm --prefix ./functions run deploy",
+    "deploystore": "firebase deploy --only firestore"
   },
   "dependencies": {
     "firebase": "^5.9.1",
