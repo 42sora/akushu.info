@@ -102,13 +102,20 @@ export default {
   },
   created () {
     const db = firebase.firestore()
-    db.collection('users')
+    const userCompletion = db.collection('users')
       .doc(this.user.uid)
       .onSnapshot(snapshot => {
         console.log(snapshot)
-        const fortune = snapshot.data().fortuneAggregateData
+        const data = snapshot.data()
+        if (!data) { return }
+
+        const fortune = data.fortuneAggregateData
         this.$store.commit('setFortune', fortune)
       })
+
+    this.$once('hook:beforeDestroy', () => {
+      userCompletion()
+    })
   }
 }
 </script>
