@@ -1,21 +1,39 @@
 <template>
   <div class="home">
-    <p @click="signOut">logout</p>
+    <p @click="signOut">
+      logout
+    </p>
     <div>
       <p>fortune music</p>
       <p>メールアドレス</p>
-      <input type="text" v-model="fortune.email">
+      <input
+        v-model="fortune.email"
+        type="text"
+      >
       <p>パスワード</p>
-      <input type="password" v-model="fortune.password">
-      <p @click="startScrapping">login</p>
+      <input
+        v-model="fortune.password"
+        type="password"
+      >
+      <p @click="startScrapping">
+        login
+      </p>
     </div>
     <template v-for="name in members">
-      <input type="checkbox" :value="name" :key="name" v-model="filterChecks">
-      {{name}}
+      <input
+        :key="name"
+        v-model="filterChecks"
+        type="checkbox"
+        :value="name"
+      >
+      {{ name }}
     </template>
-    <div v-for="event in filterd" :key="event.eventDate">
-      <p>{{event.eventDate}} {{event.eventPlace}}</p>
-      <aku-table :tickets="event.tickets"></aku-table>
+    <div
+      v-for="event in filterd"
+      :key="event.eventDate"
+    >
+      <p>{{ event.eventDate }} {{ event.eventPlace }}</p>
+      <aku-table :tickets="event.tickets" />
     </div>
   </div>
 </template>
@@ -25,7 +43,7 @@ import AkuTable from '@/components/AkuTable'
 import firebase from 'firebase'
 
 export default {
-  name: 'home',
+  name: 'Home',
   components: { AkuTable },
   data: function () {
     return {
@@ -78,6 +96,23 @@ export default {
         .filter((x, i, self) => self.indexOf(x) === i)
     }
   },
+  created () {
+    const db = firebase.firestore()
+    const userCompletion = db.collection('users')
+      .doc(this.user.uid)
+      .onSnapshot(snapshot => {
+        console.log(snapshot)
+        const data = snapshot.data()
+        if (!data) { return }
+
+        const fortune = data.fortuneAggregateData
+        this.$store.commit('setFortune', fortune)
+      })
+
+    this.$once('hook:beforeDestroy', () => {
+      userCompletion()
+    })
+  },
   methods: {
     async signOut () {
       await firebase.auth().signOut()
@@ -99,23 +134,6 @@ export default {
       const res = await startScraping({ email, password })
       console.log(res)
     }
-  },
-  created () {
-    const db = firebase.firestore()
-    const userCompletion = db.collection('users')
-      .doc(this.user.uid)
-      .onSnapshot(snapshot => {
-        console.log(snapshot)
-        const data = snapshot.data()
-        if (!data) { return }
-
-        const fortune = data.fortuneAggregateData
-        this.$store.commit('setFortune', fortune)
-      })
-
-    this.$once('hook:beforeDestroy', () => {
-      userCompletion()
-    })
   }
 }
 </script>

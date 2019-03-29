@@ -1,8 +1,16 @@
 <template>
   <div class="akuTable">
     <table>
-      <tr v-for="row in tableData" :key="row[0]">
-        <td v-for="(x,i) in row" :key="tableData[0][i]">{{x}}</td>
+      <tr
+        v-for="row in tableData"
+        :key="row[0]"
+      >
+        <td
+          v-for="(x,i) in row"
+          :key="tableData[0][i]"
+        >
+          {{ x }}
+        </td>
       </tr>
     </table>
   </div>
