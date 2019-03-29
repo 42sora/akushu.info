@@ -1,8 +1,52 @@
 <template>
   <div class="home">
-    <p @click="signOut">
-      logout
-    </p>
+    <nav
+      class="navbar"
+      role="navigation"
+      aria-label="main navigation"
+    >
+      <div class="container">
+        <div class="navbar-brand">
+          <a
+            class="navbar-item"
+            @click="this.$router.push('/')"
+          >
+            <img
+              src="../assets/logo.png"
+              width="112"
+              height="28"
+            >
+          </a>
+          <a
+            role="button"
+            class="navbar-burger burger"
+            aria-label="menu"
+            aria-expanded="false"
+            :class="{'is-active':menuIsActive}"
+            @click="menuIsActive=!menuIsActive"
+          >
+            <span aria-hidden="true" />
+            <span aria-hidden="true" />
+            <span aria-hidden="true" />
+          </a>
+        </div>
+        <div
+          class="navbar-menu"
+          :class="{'is-active':menuIsActive}"
+        >
+          <div class="navbar-end">
+            <div class="navbar-item">
+              <div class="buttons">
+                <a
+                  class="button is-light"
+                  @click="signOut"
+                >ログアウト</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </nav>
     <div>
       <p>fortune music</p>
       <p>メールアドレス</p>
@@ -47,6 +91,7 @@ export default {
   components: { AkuTable },
   data: function () {
     return {
+      menuIsActive: false,
       filterChecks: [],
       fortune: {
         name: '',
