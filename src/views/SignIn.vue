@@ -1,5 +1,5 @@
 <template>
-  <div class="login">
+  <div class="SignIn">
     <div id="firebaseui-auth-container" />
     <div v-show="isLoading">
       Loading...
@@ -12,7 +12,7 @@ import firebase from 'firebase'
 import firebaseui from 'firebaseui-ja'
 
 export default {
-  name: 'Login',
+  name: 'SignIn',
   components: { },
   data: function () {
     return { isLoading: true }
