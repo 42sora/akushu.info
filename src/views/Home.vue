@@ -47,21 +47,31 @@
         </div>
       </div>
     </nav>
-    <div>
-      <p>fortune music</p>
-      <p>メールアドレス</p>
-      <input
-        v-model="fortune.email"
-        type="text"
-      >
-      <p>パスワード</p>
-      <input
-        v-model="fortune.password"
-        type="password"
-      >
-      <p @click="startScrapping">
-        login
-      </p>
+    <div class="level">
+      <div class="level-item container">
+        <button
+          class="button is-primary is-large has-text-weight-semibold modal-button"
+          data-target="modal"
+          aria-haspopup="true"
+          @click="isFortuneLogin=true"
+        >
+          forTUNE musicにログイン
+        </button>
+        <div
+          class="modal"
+          :class="{'is-active':isFortuneLogin}"
+        >
+          <div
+            class="modal-background"
+            @click="isFortuneLogin=false"
+          />
+          <div class="modal-content">
+            <div class="box">
+              <fortune-login-form @login-fortune="startScrapping($event)" />
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
     <template v-for="name in members">
       <input
@@ -84,19 +94,17 @@
 
 <script>
 import AkuTable from '@/components/AkuTable'
+import FortuneLoginForm from '@/components/FortuneLoginForm'
 import firebase from 'firebase'
 
 export default {
   name: 'Home',
-  components: { AkuTable },
+  components: { AkuTable, FortuneLoginForm },
   data: function () {
     return {
       menuIsActive: false,
-      filterChecks: [],
-      fortune: {
-        name: '',
-        password: ''
-      }
+      isFortuneLogin: false,
+      filterChecks: []
     }
   },
   computed: {
@@ -163,21 +171,11 @@ export default {
       await firebase.auth().signOut()
       this.$router.push('/signin')
     },
-    async startScrapping () {
-      const email = this.fortune.email
-      if (!email) {
-        alert('メールアドレスを入力してください。')
-        return
-      }
-
-      const password = this.fortune.password
-      if (!password) {
-        alert('パスワードを入力してください。')
-        return
-      }
+    async startScrapping (event) {
       const startScraping = firebase.app().functions('asia-northeast1').httpsCallable('startScraping')
-      const res = await startScraping({ email, password })
+      const res = await startScraping({ email: event.email, password: event.password })
       console.log(res)
+      this.$store.isFortuneLogin = false
     }
   }
 }
