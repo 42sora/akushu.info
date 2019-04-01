@@ -38,6 +38,13 @@ const calcEventDate = (entryDateStr: string, eventMonthDay: string) => {
   return eventYear + '-' + eventMonth + '-' + eventDay
 }
 
+const normalizePartName = (partName: string) => {
+  if (partName.startsWith('第')) {
+    return partName.substring(1)
+  }
+  return partName
+}
+
 const login = async (page: puppeteer.Page, email: string, password: string) => {
   await logging(page)
   await page.type('input[name="login_id"]', email)
@@ -92,7 +99,7 @@ const getDetails = async (page: puppeteer.Page, target: EntryListData) => {
       .split(/\s/)
     const eventDate = calcEventDate(target.entryDate, bracketed[0])
     const eventPlace = bracketed[1]
-    const partName = bracketed[2]
+    const partName = normalizePartName(bracketed[2])
     const amont = parseInt(td3.replace(/[^0-9^\.]/g, ''), 10)
 
     return {
