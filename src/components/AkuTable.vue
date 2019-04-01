@@ -19,8 +19,7 @@
 <script>
 export default {
   props: {
-    tickets: { type: Array, required: true },
-    filter: { type: Array, default: () => [] }
+    tickets: { type: Array, required: true }
   },
   computed: {
     tableData () {
@@ -32,7 +31,6 @@ export default {
       const members = this.tickets
         .map(x => x.memberName)
         .filter((x, i, self) => self.indexOf(x) === i)
-        .filter(x => this.filter.length === 0 || this.filter.includes(x))
 
       const table = []
 
