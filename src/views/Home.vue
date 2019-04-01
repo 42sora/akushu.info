@@ -1,11 +1,11 @@
 <template>
   <div class="home">
-    <nav
-      class="navbar"
-      role="navigation"
-      aria-label="main navigation"
-    >
-      <div class="container">
+    <div class="container">
+      <nav
+        class="navbar"
+        role="navigation"
+        aria-label="main navigation"
+      >
         <div class="navbar-brand">
           <a
             class="navbar-item"
@@ -45,49 +45,57 @@
             </div>
           </div>
         </div>
-      </div>
-    </nav>
-    <div class="level">
-      <div class="level-item container">
-        <button
-          class="button is-primary is-large has-text-weight-semibold modal-button"
-          data-target="modal"
-          aria-haspopup="true"
-          @click="isFortuneLogin=true"
-        >
-          forTUNE musicにログイン
-        </button>
-        <div
-          class="modal"
-          :class="{'is-active':isFortuneLogin}"
-        >
+      </nav>
+      <div class="level">
+        <div class="level-item container">
+          <button
+            class="button is-primary is-large has-text-weight-semibold modal-button"
+            data-target="modal"
+            aria-haspopup="true"
+            @click="isFortuneLogin=true"
+          >
+            forTUNE musicにログイン
+          </button>
           <div
-            class="modal-background"
-            @click="isFortuneLogin=false"
-          />
-          <div class="modal-content">
-            <div class="box">
-              <fortune-login-form @login-fortune="startScrapping($event)" />
+            class="modal"
+            :class="{'is-active':isFortuneLogin}"
+          >
+            <div
+              class="modal-background"
+              @click="isFortuneLogin=false"
+            />
+            <div class="modal-content">
+              <div class="box">
+                <fortune-login-form @login-fortune="startScrapping($event)" />
+              </div>
             </div>
           </div>
         </div>
       </div>
-    </div>
-    <template v-for="name in members">
-      <input
-        :key="name"
-        v-model="filterChecks"
-        type="checkbox"
-        :value="name"
+      <template v-for="name in members">
+        <input
+          :key="name"
+          v-model="filterChecks"
+          type="checkbox"
+          :value="name"
+        >
+        {{ name }}
+      </template>
+      <div
+        v-for="event in filterd"
+        :key="event.eventDate"
+        class="card"
       >
-      {{ name }}
-    </template>
-    <div
-      v-for="event in filterd"
-      :key="event.eventDate"
-    >
-      <p>{{ event.eventDate }} {{ event.eventPlace }}</p>
-      <aku-table :tickets="event.tickets" />
+        <header class="card-header">
+          <p class="card-header-title">
+            {{ event.eventDate }} {{ event.eventPlace }}
+          </p>
+        </header>
+        <div class="card-content">
+          <aku-table :tickets="event.tickets" />
+        </div>
+      </div>
+      <br>
     </div>
   </div>
 </template>

@@ -1,17 +1,39 @@
 <template>
   <div class="akuTable">
-    <table>
-      <tr
-        v-for="row in tableData"
-        :key="row[0]"
+    <table class="table">
+      <template
+        v-for="(row,rowIndex) in tableData"
       >
-        <td
-          v-for="(x,i) in row"
-          :key="tableData[0][i]"
+        <thead
+          v-if="rowIndex===0"
+          :key="row[0]"
         >
-          {{ x }}
-        </td>
-      </tr>
+          <tr>
+            <td
+              v-for="(x,i) in row"
+              :key="tableData[0][i]"
+              class="has-text-centered"
+            >
+              {{ x }}
+            </td>
+          </tr>
+        </thead>
+        <tbody
+          v-else
+          :key="row[0]"
+        >
+          <tr>
+            <td
+              v-for="(x,i) in row"
+              :key="tableData[0][i]"
+              class="has-text-centered"
+              :class="{'no-wrap':i===0}"
+            >
+              {{ x }}
+            </td>
+          </tr>
+        </tbody>
+      </template>
     </table>
   </div>
 </template>
@@ -59,7 +81,7 @@ export default {
 }
 </script>
 <style>
-td {
-  text-align: center;
+.no-wrap{
+  white-space: nowrap;
 }
 </style>
