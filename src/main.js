@@ -4,6 +4,7 @@ import router from './router'
 import store from './store'
 import './registerServiceWorker'
 import firebase from 'firebase'
+import '@fortawesome/fontawesome-free/js/all'
 
 const config = {
   apiKey: 'AIzaSyC3PWmSiMDYHviFrbYDbK0aJaLSY3amEHE',
