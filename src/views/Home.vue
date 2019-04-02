@@ -99,7 +99,6 @@
 import AkuTable from '@/components/AkuTable'
 import FortuneLoginForm from '@/components/FortuneLoginForm'
 import MemberFilter from '@/components/MemberFilter'
-import firebase from 'firebase'
 
 export default {
   name: 'Home',
@@ -154,8 +153,7 @@ export default {
     }
   },
   created () {
-    const db = firebase.firestore()
-    const userCompletion = db.collection('users')
+    const userCompletion = this.$firestore.collection('users')
       .doc(this.user.uid)
       .onSnapshot(snapshot => {
         console.log(snapshot)
@@ -172,11 +170,11 @@ export default {
   },
   methods: {
     async signOut () {
-      await firebase.auth().signOut()
+      await this.$auth.signOut()
       this.$router.push('/signin')
     },
     async startScrapping (event) {
-      const startScraping = firebase.app().functions('asia-northeast1').httpsCallable('startScraping')
+      const startScraping = this.$functions.httpsCallable('startScraping')
       const res = await startScraping({ email: event.email, password: event.password })
       console.log(res)
       this.$store.isFortuneLogin = false

@@ -31,7 +31,7 @@ export default {
   },
   mounted () {
     let ui = firebaseui.auth.AuthUI.getInstance()
-    if (!ui) { ui = new firebaseui.auth.AuthUI(firebase.auth()) }
+    if (!ui) { ui = new firebaseui.auth.AuthUI(this.$auth) }
     ui.start('#firebaseui-auth-container', {
       callbacks: {
         signInSuccessWithAuthResult: (authResult, redirectUrl) => {

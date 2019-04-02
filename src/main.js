@@ -18,8 +18,13 @@ firebase.initializeApp(config)
 
 Vue.config.productionTip = false
 
+Vue.prototype.$firestore = firebase.firestore()
+Vue.prototype.$functions = firebase.app().functions('asia-northeast1')
+const auth = firebase.auth()
+Vue.prototype.$auth = auth
+
 // ここに書くのは適切ではない気がする
-firebase.auth().onAuthStateChanged((user) => {
+auth.onAuthStateChanged((user) => {
   console.log(user)
   if (user) {
     store.commit('signIn', {
