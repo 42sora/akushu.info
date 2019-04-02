@@ -13,10 +13,7 @@
         </span>
       </a>
     </div>
-    <div
-      class="dropdown is-hoverable"
-      :class="{'is-active':isActive}"
-    >
+    <div class="dropdown is-hoverable">
       <div class="dropdown-trigger">
         <button
           class="button"
