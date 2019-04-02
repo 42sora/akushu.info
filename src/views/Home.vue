@@ -72,17 +72,13 @@
           </div>
         </div>
       </div>
-      <template v-for="name in members">
-        <input
-          :key="name"
-          v-model="filterChecks"
-          type="checkbox"
-          :value="name"
-        >
-        {{ name }}
-      </template>
+      <MemberFilter
+        class="box"
+        :members="members"
+        @chengedFilter="filter=$event"
+      />
       <div
-        v-for="event in filterd"
+        v-for="event in filtered"
         :key="event.eventDate"
         class="card"
       >
@@ -95,7 +91,6 @@
           <aku-table :tickets="event.tickets" />
         </div>
       </div>
-      <br>
     </div>
   </div>
 </template>
@@ -103,16 +98,17 @@
 <script>
 import AkuTable from '@/components/AkuTable'
 import FortuneLoginForm from '@/components/FortuneLoginForm'
+import MemberFilter from '@/components/MemberFilter'
 import firebase from 'firebase'
 
 export default {
   name: 'Home',
-  components: { AkuTable, FortuneLoginForm },
+  components: { AkuTable, FortuneLoginForm, MemberFilter },
   data: function () {
     return {
       menuIsActive: false,
       isFortuneLogin: false,
-      filterChecks: []
+      filter: []
     }
   },
   computed: {
@@ -137,15 +133,15 @@ export default {
         .sort((a, b) => compare(a.eventDate, b.eventDate))
         .reverse()
     },
-    filterd () {
-      if (this.filterChecks.length === 0) return this.origin
+    filtered () {
+      if (this.filter.length === 0) return this.origin
       return this.origin
         .map(event => {
           return {
             eventDate: event.eventDate,
             eventPlace: event.eventPlace,
             tickets: event.tickets.filter(ticket =>
-              this.filterChecks.includes(ticket.memberName)
+              this.filter.includes(ticket.memberName)
             )
           }
         })
@@ -189,7 +185,4 @@ export default {
 }
 </script>
 <style>
-td {
-  text-align: center;
-}
 </style>
