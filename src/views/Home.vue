@@ -177,7 +177,7 @@ export default {
       const startScraping = this.$functions.httpsCallable('startScraping')
       const res = await startScraping({ email: event.email, password: event.password })
       console.log(res)
-      this.$store.isFortuneLogin = false
+      this.isFortuneLogin = false
     }
   }
 }
