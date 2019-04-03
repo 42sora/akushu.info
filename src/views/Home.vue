@@ -28,7 +28,7 @@
           </div>
         </div>
       </div>
-      <MemberFilter
+      <member-filter
         class="box"
         :members="members"
         @chengedFilter="filter=$event"
