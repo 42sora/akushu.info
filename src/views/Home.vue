@@ -1,51 +1,7 @@
 <template>
   <div class="home">
     <div class="container">
-      <nav
-        class="navbar"
-        role="navigation"
-        aria-label="main navigation"
-      >
-        <div class="navbar-brand">
-          <a
-            class="navbar-item"
-            @click="this.$router.push('/')"
-          >
-            <img
-              src="../assets/logo.png"
-              width="112"
-              height="28"
-            >
-          </a>
-          <a
-            role="button"
-            class="navbar-burger burger"
-            aria-label="menu"
-            aria-expanded="false"
-            :class="{'is-active':menuIsActive}"
-            @click="menuIsActive=!menuIsActive"
-          >
-            <span aria-hidden="true" />
-            <span aria-hidden="true" />
-            <span aria-hidden="true" />
-          </a>
-        </div>
-        <div
-          class="navbar-menu"
-          :class="{'is-active':menuIsActive}"
-        >
-          <div class="navbar-end">
-            <div class="navbar-item">
-              <div class="buttons">
-                <a
-                  class="button is-light"
-                  @click="signOut"
-                >ログアウト</a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </nav>
+      <main-nav />
       <div class="level">
         <div class="level-item container">
           <button
@@ -96,16 +52,16 @@
 </template>
 
 <script>
+import MainNav from '@/components/MainNav'
 import AkuTable from '@/components/AkuTable'
 import FortuneLoginForm from '@/components/FortuneLoginForm'
 import MemberFilter from '@/components/MemberFilter'
 
 export default {
   name: 'Home',
-  components: { AkuTable, FortuneLoginForm, MemberFilter },
+  components: { MainNav, AkuTable, FortuneLoginForm, MemberFilter },
   data: function () {
     return {
-      menuIsActive: false,
       isFortuneLogin: false,
       filter: []
     }
@@ -169,11 +125,6 @@ export default {
     })
   },
   methods: {
-    async signOut () {
-      await this.$auth.signOut()
-      this.$store.commit('signOut')
-      this.$router.push('/signin')
-    },
     async startScrapping (event) {
       const startScraping = this.$functions.httpsCallable('startScraping')
       const res = await startScraping({ email: event.email, password: event.password })
