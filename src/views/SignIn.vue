@@ -17,17 +17,16 @@ export default {
   data: function () {
     return { isLoading: true }
   },
-  computed: {
-    user: function () {
-      return this.$store.state.user
-    }
-  },
-  watch: {
-    user: function () {
-      if (this.$store.state.user.uid) {
+  created () {
+    const unsubscribe = this.$auth.onAuthStateChanged((user) => {
+      if (user) {
+        this.$store.commit('signIn', { user: user })
         this.$router.push('/')
       }
-    }
+    })
+    this.$once('hook:beforeDestroy', () => {
+      unsubscribe()
+    })
   },
   mounted () {
     let ui = firebaseui.auth.AuthUI.getInstance()
@@ -35,14 +34,15 @@ export default {
     ui.start('#firebaseui-auth-container', {
       callbacks: {
         signInSuccessWithAuthResult: (authResult, redirectUrl) => {
-          return true
+          this.$store.commit('signIn', { user: authResult.user })
+          this.$router.push('/')
+          return false
         },
         uiShown: () => {
           this.isLoading = false
         }
       },
       signInFlow: 'redirect',
-      signInSuccessUrl: '/',
       signInOptions: [
         firebase.auth.GoogleAuthProvider.PROVIDER_ID,
         firebaseui.auth.AnonymousAuthProvider.PROVIDER_ID

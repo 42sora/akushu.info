@@ -1,5 +1,4 @@
 import Vue from 'vue'
-import store from './store'
 import firebase from 'firebase'
 
 const config = {
@@ -12,21 +11,7 @@ const config = {
 }
 firebase.initializeApp(config)
 
+// extend prototype of Vue
 Vue.prototype.$firestore = firebase.firestore()
 Vue.prototype.$functions = firebase.app().functions('asia-northeast1')
-const auth = firebase.auth()
-Vue.prototype.$auth = auth
-
-// ここに書くのは適切ではない気がする
-auth.onAuthStateChanged((user) => {
-  console.log(user)
-  if (user) {
-    store.commit('signIn', {
-      user: {
-        uid: user.uid
-      }
-    })
-  } else {
-    store.commit('signOut')
-  }
-})
+Vue.prototype.$auth = firebase.auth()

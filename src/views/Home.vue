@@ -171,6 +171,7 @@ export default {
   methods: {
     async signOut () {
       await this.$auth.signOut()
+      this.$store.commit('signOut')
       this.$router.push('/signin')
     },
     async startScrapping (event) {
