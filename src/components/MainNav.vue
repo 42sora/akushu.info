@@ -11,9 +11,10 @@
       >
         <img
           src="../assets/logo.png"
-          width="112"
+          width="28"
           height="28"
         >
+        <h4 class="title is-4">坂道握手会まとめ</h4>
       </a>
       <a
         role="button"
