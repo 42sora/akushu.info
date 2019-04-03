@@ -29,6 +29,7 @@
         </div>
       </div>
       <member-filter
+        v-if="members.length>0"
         class="box"
         :members="members"
         @chengedFilter="filter=$event"
@@ -71,22 +72,7 @@ export default {
       return this.$store.state.user
     },
     origin () {
-      const compare = (a, b) => {
-        if (a === b) { return 0 }
-        const splitedA = a.split('-').map(x => parseInt(x, 10))
-        const splitedB = b.split('-').map(x => parseInt(x, 10))
-        if (splitedA[0] < splitedB[0] ||
-        (splitedA[0] === splitedB[0] && splitedA[1] < splitedB[1]) ||
-        (splitedA[0] === splitedB[0] && splitedA[1] === splitedB[1] && splitedA[2] < splitedB[2])) {
-          return -1
-        } else {
-          return 1
-        }
-      }
       return this.$store.state.fortune
-        .slice()
-        .sort((a, b) => compare(a.eventDate, b.eventDate))
-        .reverse()
     },
     filtered () {
       if (this.filter.length === 0) return this.origin
