@@ -153,7 +153,7 @@ export default {
     }
   },
   created () {
-    const userCompletion = this.$firestore.collection('users')
+    const unsubscribe = this.$firestore.collection('users')
       .doc(this.user.uid)
       .onSnapshot(snapshot => {
         console.log(snapshot)
@@ -165,7 +165,7 @@ export default {
       })
 
     this.$once('hook:beforeDestroy', () => {
-      userCompletion()
+      unsubscribe()
     })
   },
   methods: {
