@@ -116,6 +116,7 @@ export default {
       const res = await startScraping({ email: event.email, password: event.password })
       console.log(res)
       this.isFortuneLogin = false
+      event.close()
     }
   }
 }

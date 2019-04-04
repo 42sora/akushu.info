@@ -45,6 +45,7 @@
       <div class="control">
         <a
           class="button is-primary"
+          :class="{'is-loading':isSending}"
           @click="login"
         >
           ログイン
@@ -86,7 +87,8 @@ export default {
       email: '',
       password: '',
       isValidEmail: true,
-      isValidPassword: true
+      isValidPassword: true,
+      isSending: false
     }
   },
   methods: {
@@ -99,9 +101,14 @@ export default {
 
       if (!this.isValidEmail || !this.isValidPassword) { return }
 
-      this.$emit('login-fortune', { email, password })
-      this.email = ''
-      this.password = ''
+      this.isSending = true
+
+      const close = () => {
+        this.email = ''
+        this.password = ''
+        this.isSending = false
+      }
+      this.$emit('login-fortune', { email, password, close })
     }
   }
 }
