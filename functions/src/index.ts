@@ -3,6 +3,7 @@ import * as admin from 'firebase-admin'
 import * as puppeteer from 'puppeteer'
 import * as fortune from './scraping/fortune'
 import * as aggregator from './aggregator/fortuneAggregator'
+import Waiter from './utils/waiter'
 
 // firestore
 admin.initializeApp(functions.config().firebase)
@@ -44,23 +45,26 @@ export const startScraping = functions
       throw new functions.https.HttpsError('invalid-argument', 'bad request')
     }
 
+    const queue = await db.collection('queue').add({
+      uid: auth.uid,
+      state: 'WAITING',
+      reason: ''
+    })
+
     const message: ScrapingFortuneMessage = {
+      queueId: queue.id,
       uid: auth.uid,
       email: email,
       password: password
     }
 
     const dataBuffer = Buffer.from(JSON.stringify(message))
-    pubsub
+    const messageId = await pubsub
       .topic(TOPIC_SCRAPING_FORTUNE)
       .publish(dataBuffer)
-      .then((messageId: any) => {
-        console.log(`Message ${messageId} published.`)
-      })
-      .catch((err: any) => {
-        console.error('ERROR:', err)
-      })
-    return { status: 'OK' }
+    console.debug(`Message ${messageId} published.`)
+
+    return { status: 'OK', queueId: queue.id }
   })
 
 export const subFortune = functions
@@ -73,20 +77,34 @@ export const subFortune = functions
   .onPublish(async (message, context) => {
     const messageData: ScrapingFortuneMessage = message.json
 
-    const page = await getNewPage()
-    try {
-      const details = await fortune.getFortune(page, messageData)
-      console.info(JSON.stringify(details, undefined, 1))
-      const results = aggregator.aggregate(details)
-      console.info(JSON.stringify(results, undefined, 1))
-      await db
-        .collection('users')
-        .doc(messageData.uid)
-        .set({ fortuneAggregateData: results }, { merge: true })
-    } catch (e) {
-      console.error(e)
-      throw e
-    } finally {
-      await page.close()
-    }
+    const waiter = new Waiter()
+
+    const queue = db.collection('queue').doc(messageData.queueId)
+    const unsubscribe = queue.onSnapshot(async snapshot => {
+      if (snapshot.get('state') && snapshot.get('state') === 'READY') {
+        const page = await getNewPage()
+        try {
+          const details = await fortune.getFortune(page, messageData)
+          console.debug(JSON.stringify(details, undefined, 1))
+          const results = aggregator.aggregate(details)
+          console.debug(JSON.stringify(results, undefined, 1))
+
+          await db
+            .collection('users')
+            .doc(messageData.uid)
+            .set({ fortuneAggregateData: results }, { merge: true })
+          await snapshot.ref.update({ state: 'COMPLETE' })
+        } catch (e) {
+          console.error(e)
+          await snapshot.ref.update({ state: 'FAILED', reason: e })
+          throw e
+        } finally {
+          unsubscribe()
+          await page.close()
+          waiter.notify()
+        }
+      }
+    })
+
+    await waiter.wait()
   })

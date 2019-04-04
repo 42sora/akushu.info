@@ -1,4 +1,5 @@
 interface ScrapingFortuneMessage {
+  queueId: string
   uid: string
   email: string
   password: string
@@ -28,6 +29,8 @@ interface Ticket {
   partName: string
   amont: number
 }
+
+type STATE = 'WAITING' | 'READY' | 'EXECUTING' | 'COMPLETE' | 'FAILED'
 
 interface A extends Element {
   href: string
