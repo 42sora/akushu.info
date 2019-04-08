@@ -45,6 +45,7 @@ export default {
       signInFlow: 'redirect',
       signInOptions: [
         firebase.auth.GoogleAuthProvider.PROVIDER_ID,
+        firebase.auth.TwitterAuthProvider.PROVIDER_ID,
         firebaseui.auth.AnonymousAuthProvider.PROVIDER_ID
       ],
       tosUrl: '<your-tos-url>',
