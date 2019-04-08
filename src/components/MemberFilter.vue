@@ -9,7 +9,7 @@
       >
         <span>{{ selectedName }}</span>
         <span class="icon is-small">
-          <i class="fas fa-times" />
+          <font-awesome-icon icon="times" />
         </span>
       </a>
     </div>
@@ -23,10 +23,7 @@
           <!-- @click="isActive=!isActive" -->
           <span>メンバーで絞り込む</span>
           <span class="icon is-small">
-            <i
-              class="fas fa-angle-down"
-              aria-hidden="true"
-            />
+            <font-awesome-icon icon="angle-down" />
           </span>
         </button>
       </div>
@@ -53,7 +50,7 @@
       @click="filter=[]"
     >
       <span class="icon is-small">
-        <i class="fas fa-times" />
+        <font-awesome-icon icon="times" />
       </span>
     </a>
   </div>
