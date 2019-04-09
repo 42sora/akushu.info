@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import store from './store'
 import Home from './views/Home.vue'
+import NotFound from './views/NotFound.vue'
 import SignIn from './views/SignIn.vue'
 
 Vue.use(Router)
@@ -19,6 +20,10 @@ const router = new Router({
       path: '/signin',
       name: 'signin',
       component: SignIn
+    }, {
+      path: '*',
+      name: 'notfound',
+      component: NotFound
     }
   ]
 })
