@@ -123,12 +123,12 @@ export default {
       const nowDateStr = getNowDateStr()
       return this.filtered
         .filter(event => !isPast(event.eventDate, nowDateStr))
-        .reverse()
     },
     pastEvents () {
       const nowDateStr = getNowDateStr()
       return this.filtered
         .filter(event => isPast(event.eventDate, nowDateStr))
+        .reverse()
     },
     members () {
       return this.origin

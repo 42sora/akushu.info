@@ -11,9 +11,7 @@ export default new Vuex.Store({
   },
   mutations: {
     setFortune (state, fortune) {
-      state.fortune = fortune
-        .sort((a, b) => compareDateStr(a.eventDate, b.eventDate))
-        .reverse()
+      state.fortune = fortune.sort((a, b) => compareDateStr(a.eventDate, b.eventDate))
     },
     signIn (state, payload) {
       console.log('commit:signIn')
