@@ -35,7 +35,29 @@
         @chengedFilter="filter=$event"
       />
       <div
-        v-for="event in filtered"
+        v-for="event in futureEvtnts"
+        :key="event.eventDate"
+        class="card"
+      >
+        <header class="card-header">
+          <p class="card-header-title">
+            {{ event.eventDate }} {{ event.eventPlace }}
+          </p>
+        </header>
+        <div class="card-content">
+          <aku-table :tickets="event.tickets" />
+        </div>
+      </div>
+      <div
+        v-if="pastEvents.length>0"
+        class="top-margin"
+      >
+        <h2 class="subtitle">
+          過去のイベント
+        </h2>
+      </div>
+      <div
+        v-for="event in pastEvents"
         :key="event.eventDate"
         class="card"
       >
@@ -53,10 +75,19 @@
 </template>
 
 <script>
+import { isPast } from '@/utils/DateStrComparer'
 import MainNav from '@/components/MainNav'
 import AkuTable from '@/components/AkuTable'
 import FortuneLoginForm from '@/components/FortuneLoginForm'
 import MemberFilter from '@/components/MemberFilter'
+
+const getNowDateStr = () => {
+  const now = new Date()
+  const year = now.getFullYear()
+  const month = now.getMonth() + 1
+  const day = now.getDate()
+  return year + '-' + month + '-' + day
+}
 
 export default {
   name: 'Home',
@@ -87,6 +118,15 @@ export default {
           }
         })
         .filter(event => event.tickets.length > 0)
+    },
+    futureEvtnts () {
+      return this.filtered
+        .filter(event => !isPast(event.eventDate, getNowDateStr()))
+        .reverse()
+    },
+    pastEvents () {
+      return this.filtered
+        .filter(event => isPast(event.eventDate, getNowDateStr()))
     },
     members () {
       return this.origin
@@ -122,4 +162,7 @@ export default {
 }
 </script>
 <style>
+.top-margin{
+  margin: 24px auto auto auto;
+}
 </style>
