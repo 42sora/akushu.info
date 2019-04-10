@@ -120,13 +120,15 @@ export default {
         .filter(event => event.tickets.length > 0)
     },
     futureEvtnts () {
+      const nowDateStr = getNowDateStr()
       return this.filtered
-        .filter(event => !isPast(event.eventDate, getNowDateStr()))
+        .filter(event => !isPast(event.eventDate, nowDateStr))
         .reverse()
     },
     pastEvents () {
+      const nowDateStr = getNowDateStr()
       return this.filtered
-        .filter(event => isPast(event.eventDate, getNowDateStr()))
+        .filter(event => isPast(event.eventDate, nowDateStr))
     },
     members () {
       return this.origin
