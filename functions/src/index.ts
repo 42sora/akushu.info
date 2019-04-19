@@ -73,38 +73,75 @@ export const startScraping = functions
       .catch((err: any) => {
         console.error('ERROR:', err)
       })
+    await db
+      .collection('users')
+      .doc(auth.uid)
+      .set({ scrapingState: { state: 'WAITING' } }, { merge: true })
+
     return { status: 'OK' }
   })
 
 export const subFortune = functions
   .region(REGION)
   .runWith({
-    timeoutSeconds: 300,
+    timeoutSeconds: 540,
     memory: '1GB'
   })
   .pubsub.topic(TOPIC_SCRAPING_FORTUNE)
   .onPublish(async (message, _) => {
+
     const messageData: ScrapingFortuneMessage = message.json
+    const userStore = db
+      .collection('users')
+      .doc(messageData.uid)
+
+    // tslint:disable-next-line: no-floating-promises
+    userStore.set({ scrapingState: { state: 'EXECUTING' } }, { merge: true })
 
     const page = await getNewPage()
     try {
       const { isSuccess, errorMessage } = await fortune.login(page, messageData.email, messageData.password)
       if (!isSuccess) {
         console.error(errorMessage)
+        await userStore.set({ scrapingState: { state: 'LOGIN_FAILED', errorMessage } }, { merge: true })
+        return
       }
+
       const entryList = await fortune.getEntryList(page)
       for (const entry of entryList) {
         entry.details = await fortune.getEntryDetail(page, entry.detailURL)
       }
       console.info(JSON.stringify(entryList, undefined, 1))
+      const setEntryList = userStore.set({ fortune: { entryList } }, { merge: true })
+
+      const applyList = await fortune.getApplyList(page)
+      for (const apply of applyList) {
+        if (apply.isLotteryCompleted) {
+          apply.details = await fortune.getApplyDetailAfterLottery(page, apply.detailURL)
+        } else {
+          apply.details = await fortune.getApplyDetailBeforeLottery(page, apply.detailURL)
+        }
+      }
+      console.info(JSON.stringify(applyList, undefined, 1))
+      const setApplyList = userStore.set({ fortune: { applyList } }, { merge: true })
+
       const results = aggregator.aggregateEntry(entryList)
       console.info(JSON.stringify(results, undefined, 1))
-      await db
-        .collection('users')
-        .doc(messageData.uid)
-        .set({ fortuneAggregateData: results }, { merge: true })
+      const setAggregate = userStore.set({ fortuneAggregateData: results }, { merge: true })
+
+      const setState = userStore
+        .set({ scrapingState: { state: 'COMPLETED' } }, { merge: true })
+      await Promise.all([setEntryList, setApplyList, setAggregate, setState])
     } catch (e) {
       console.error(e)
+      await userStore.set(
+        {
+          scrapingState: {
+            state: 'SYSTEM_ERROR',
+            errorMessage: JSON.stringify(e, undefined, 1)
+          }
+        }, { merge: true }
+      )
       throw e
     } finally {
       await page.close()
