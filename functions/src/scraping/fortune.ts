@@ -1,9 +1,10 @@
-import * as puppeteer from 'puppeteer'
+import { Page } from 'puppeteer'
 
 const LOGIN_URL = 'https://fortunemusic.jp/default/login/'
 const ENTRY_LIST_URL = 'https://fortunemusic.jp/mypage/entry_list/'
+const APPLY_LIST_URL = 'https://fortunemusic.jp/mypage/apply_list/'
 
-const logging = async (page: puppeteer.Page) => {
+const logging = async (page: Page) => {
   // await page.screenshot({ path: Date.now() + ".png", fullpage: true });
   // const title = await page.title();
   // console.info(title);
@@ -14,38 +15,8 @@ const logging = async (page: puppeteer.Page) => {
   // console.info(JSON.stringify(cookies, undefined, 1));
 }
 
-/**
- * イベント開催月日には年が含まれていないので、申込日時から年を算出する。
- * @param {string} entryDate 申込日時(ex: "2018-01-01")
- * @param {string} eventMonthDay イベント開催月日(ex: "7/16")
- */
-const calcEventDate = (entryDateStr: string, eventMonthDay: string) => {
-  const [entryYear, entryMonth, entryDay] = entryDateStr
-    .split('-')
-    .map(s => parseInt(s))
-  const [eventMonth, eventDay] = eventMonthDay.split('/').map(s => parseInt(s))
-
-  let eventYear
-  // イベント開催月日が申込日時より過去であれば翌年開催ということ。(1年以上先のイベントは算出できないけどしょうがない)
-  if (
-    eventMonth > entryMonth ||
-    (eventMonth === entryMonth && eventDay > entryDay)
-  ) {
-    eventYear = entryYear
-  } else {
-    eventYear = entryYear + 1
-  }
-  return eventYear + '-' + eventMonth + '-' + eventDay
-}
-
-const normalizePartName = (partName: string) => {
-  if (partName.startsWith('第')) {
-    return partName.substring(1)
-  }
-  return partName
-}
-
-const login = async (page: puppeteer.Page, email: string, password: string) => {
+export const login = async (page: Page, email: string, password: string) => {
+  await page.goto(LOGIN_URL, { waitUntil: 'domcontentloaded' })
   await logging(page)
   await page.type('input[name="login_id"]', email)
   await page.type('input[name="login_pw"]', password)
@@ -56,63 +27,73 @@ const login = async (page: puppeteer.Page, email: string, password: string) => {
     waitUntil: 'domcontentloaded'
   })
   await logging(page)
+  const transitionedURL = await page.url()
+  if (transitionedURL === LOGIN_URL) {
+    const errorMessage = await page.evaluate(() => {
+      const p: P | null = document.querySelector('form > div:nth-child(1) > p:nth-child(2)')
+      if (p === null) {
+        return ''
+      }
+      return p.innerText
+    })
+    return { isSuccess: false, errorMessage }
+  }
+  return { isSuccess: true, errorMessage: '' }
 }
 
-const getEntryListData = async (page: puppeteer.Page) => {
+const getEntryListData = async (page: Page) => {
   await logging(page)
   return page.evaluate(() =>
     Array.from(document.querySelectorAll('table > tbody > tr')).map(tr => {
-      const detailPageURL = (tr.querySelector('td:nth-child(1) > a') as A).href
-
-      const entryDateText = tr.querySelector('td:nth-child(2)')!.textContent!
-      const datestr = /[0-9]{4}-[0-9]{2}-[0-9]{2}/.exec(entryDateText)![0]
+      const td1 = tr.querySelector('td:nth-child(1) > a') as A
+      const detailURL = td1.href
+      const entryNumber = td1.textContent!
+      const entryDate = tr.querySelector('td:nth-child(2)')!.textContent!
+      const totalAmount = tr.querySelector('td:nth-child(3)')!.textContent!
+      const eventName = tr.querySelector('td:nth-child(4)')!.textContent!
+      const details: EntryDetail[] = []
 
       const result: EntryListData = {
-        url: detailPageURL,
-        entryDate: datestr
+        detailURL,
+        entryNumber,
+        entryDate,
+        totalAmount,
+        eventName,
+        details
       }
       return result
     })
   )
 }
 
-const getDetails = async (page: puppeteer.Page, target: EntryListData) => {
-  await page.goto(target.url, { waitUntil: 'domcontentloaded' })
+export const getEntryDetail = async (page: Page, url: string) => {
+  await page.waitFor(1000)
+  await page.goto(url, { waitUntil: 'domcontentloaded' })
   await logging(page)
   return (await page.evaluate(() =>
     Array.from(document.querySelectorAll('table > tbody > tr'))
       .slice(0, -5) // テーブルのフッター部分を除去
       .map(tr => {
         // ex:"井口　眞緒【3/24 愛知 第５部】欅坂46 8thシングル発売記念個別握手会"
-        const td1 = tr.querySelector('td:nth-child(1)')!.textContent
+        const itemName = tr.querySelector('td:nth-child(1)')!.textContent!
+        // ex:1,050円
+        const unitPrice = tr.querySelector('td:nth-child(2)')!.textContent!
         // ex:"数量2個"
-        const td3 = tr.querySelector('td:nth-child(3)')!.textContent
+        const quantity = tr.querySelector('td:nth-child(3)')!.textContent!
+        // ex:3,150円
+        const subtotal = tr.querySelector('td:nth-child(4)')!.textContent!
 
-        return { td1, td3 }
+        const reslut: EntryDetail = { itemName, unitPrice, quantity, subtotal }
+
+        return reslut
       })
-  )).map(tr => {
-    const td1 = tr.td1!
-    const td3 = tr.td3!
-    const memberName = td1.substring(0, td1.indexOf('【'))
-    const bracketed = td1
-      .substring(td1.indexOf('【') + 1, td1.indexOf('】'))
-      .split(/\s/)
-    const eventDate = calcEventDate(target.entryDate, bracketed[0])
-    const eventPlace = bracketed[1]
-    const partName = normalizePartName(bracketed[2])
-    const amont = parseInt(td3.replace(/[^0-9^\.]/g, ''), 10)
-
-    return {
-      memberName,
-      eventDate,
-      eventPlace,
-      partName,
-      amont
-    }
-  })
+  ))
 }
 
-const entryList = async (page: puppeteer.Page) => {
+
+export const getEntryList = async (page: Page, url = ENTRY_LIST_URL) => {
+  await page.waitFor(1000)
+  await page.goto(url, { waitUntil: 'domcontentloaded' })
   const entryListData = await getEntryListData(page)
   const nextPageURL = await page.evaluate(() => {
     const a: A | null = document.querySelector('p.pageNext > a')
@@ -122,47 +103,131 @@ const entryList = async (page: puppeteer.Page) => {
     return null
   })
 
-  if (nextPageURL) {
-    await page.waitFor(1000)
-    await page.goto(nextPageURL, { waitUntil: 'domcontentloaded' })
-    entryListData.push(...(await entryList(page)))
+  if (nextPageURL !== null) {
+    entryListData.push(...(await getEntryList(page, nextPageURL)))
   }
 
   return entryListData
 }
 
-export const getFortune = async (
-  page: puppeteer.Page,
-  message: ScrapingFortuneMessage
-) => {
-  await page.setRequestInterception(true)
-  page.on('request', async request => {
-    if (
-      ['image', 'stylesheet', 'font', 'script'].includes(request.resourceType())
-    ) {
-      // tslint:disable-next-line: no-floating-promises
-      request.abort()
-    } else {
-      // tslint:disable-next-line: no-floating-promises
-      request.continue()
+const getApplyListData = async (page: Page) => {
+  await logging(page)
+  return page.evaluate(() =>
+    Array.from(document.querySelectorAll('table > tbody > tr')).map(tr => {
+      const td1 = tr.querySelector('td:nth-child(1) > a') as A
+      const detailURL = td1.href
+      const applicationNumber = td1.textContent!
+      const applicationDate = tr.querySelector('td:nth-child(2)')!.textContent!
+      const applicationTotalAmount = tr.querySelector('td:nth-child(3)')!.textContent!
+      const eventName = tr.querySelector('td:nth-child(4)')!.textContent!
+      const lotteryState = tr.querySelector('td:nth-child(5)')!.textContent!
+      const lotteryResult = tr.querySelector('td:nth-child(6)')!.textContent!
+      const details: ApplyDetail[] = []
+      const isLotteryCompleted = lotteryState.indexOf("未抽選") === -1
+
+      const result: ApllyListData = {
+        detailURL,
+        applicationNumber,
+        applicationDate,
+        applicationTotalAmount,
+        eventName,
+        lotteryState,
+        lotteryResult,
+        isLotteryCompleted,
+        details
+      }
+      return result
+    })
+  )
+}
+
+export const getApplyList = async (page: Page, url = APPLY_LIST_URL) => {
+  await page.waitFor(1000)
+  await page.goto(url, { waitUntil: 'domcontentloaded' })
+  const applyListData = await getApplyListData(page)
+  const nextPageURL = await page.evaluate(() => {
+    const a: A | null = document.querySelector('p.pageNext > a')
+    if (a !== null) {
+      return a.href
     }
+    return null
   })
 
-  // login
-  await page.goto(LOGIN_URL, { waitUntil: 'domcontentloaded' })
-  await login(page, message.email, message.password)
-
-  // get detai page URLs
-  await page.waitFor(1000)
-  await page.goto(ENTRY_LIST_URL, { waitUntil: 'domcontentloaded' })
-  const entryListData = await entryList(page)
-
-  // get detail
-  const details: FortuneDetail[] = []
-  for (const data of entryListData) {
-    await page.waitFor(1000)
-    const detail = await getDetails(page, data)
-    details.push(...detail)
+  if (nextPageURL !== null) {
+    applyListData.push(...(await getApplyList(page, nextPageURL)))
   }
-  return details
+
+  return applyListData
+}
+
+export const getApplyDetailBeforeLottery = async (page: Page, url: string) => {
+  await page.waitFor(1000)
+  await page.goto(url, { waitUntil: 'domcontentloaded' })
+  await logging(page)
+  return (await page.evaluate(() =>
+    Array.from(document.querySelectorAll('table > tbody > tr'))
+      .slice(1) // ページ上部に抽選状況のテーブルがある
+      .map(tr => {
+        // ex:"星野みなみ【7/28 神奈川 第１部】乃木坂46 23rdシングル発売記念 個別握手会"
+        const itemName = tr.querySelector('td:nth-child(1)')!.textContent!
+        // ex:"1,050円"
+        const unitPrice = tr.querySelector('td:nth-child(2)')!.textContent!
+        // ex:"3個"
+        const applicationQuantity = tr.querySelector('td:nth-child(3)')!.textContent!
+
+        const reslut: ApplyDetail = {
+          itemName,
+          unitPrice,
+          applicationQuantity,
+          winningQuantity: '',
+          subtotal: ''
+        }
+        return reslut
+      })
+  ))
+}
+
+export const getApplyDetailAfterLottery = async (page: Page, url: string) => {
+  await page.waitFor(1000)
+  await page.goto(url, { waitUntil: 'domcontentloaded' })
+  await logging(page)
+  return (await page.evaluate(() =>
+    Array.from(document.querySelectorAll('table > tbody > tr'))
+      .slice(1) // ページ上部に抽選状況のテーブルがある
+      .slice(0, -2) // テーブルのフッター部分を除去
+      .map(tr => {
+        // ex:"星野みなみ【7/28 神奈川 第１部】乃木坂46 23rdシングル発売記念 個別握手会"
+        const itemName = tr.querySelector('td:nth-child(1)')!.textContent!
+        // ex:"1,050円"
+        const unitPrice = tr.querySelector('td:nth-child(2)')!.textContent!
+        // ex:"3個"
+        const applicationQuantity = tr.querySelector('td:nth-child(3)')!.textContent!
+        const td4 = tr.querySelector('td:nth-child(4)')
+        let winningQuantity: string
+        if (td4 !== null) {
+          // ex:"3個"
+          winningQuantity = td4.textContent!
+        } else {
+          winningQuantity = ''
+        }
+        const td5 = tr.querySelector('td:nth-child(5)')
+        let subtotal: string
+        if (td5 !== null) {
+          // ex:"3,150円"
+          subtotal = td5.textContent!
+        } else {
+          subtotal = ''
+        }
+
+        const reslut: ApplyDetail = {
+          itemName,
+          unitPrice,
+          applicationQuantity,
+          winningQuantity,
+          subtotal
+        }
+
+        return reslut
+      })
+  ))
 }
