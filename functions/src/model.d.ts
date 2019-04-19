@@ -5,19 +5,22 @@ interface ScrapingFortuneMessage {
 }
 
 interface EntryListData {
-  url: string
+  detailPageURL: string
+  entryNumber: string
   entryDate: string
+  totalAmount: string
+  eventName: string
+  details: EntryDetail[]
 }
 
-interface FortuneDetail {
-  memberName: string
-  eventDate: string
-  eventPlace: string
-  partName: string
-  amont: number
+interface EntryDetail {
+  itemName: string
+  unitPrice: string
+  quantity: string
+  subtotal: string
 }
 
-interface FortuneAggregateResult {
+interface FortuneEvent {
   eventDate: string
   eventPlace: string
   tickets: Ticket[]
@@ -31,6 +34,10 @@ interface Ticket {
 
 interface A extends Element {
   href: string
+}
+
+interface P extends Element {
+  innerText: string
 }
 
 interface Array<T> {

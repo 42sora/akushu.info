@@ -24,7 +24,20 @@ const getNewPage = async () => {
       args: ['--no-sandbox']
     })
   }
-  return browser.newPage()
+  const page = await browser.newPage()
+  await page.setRequestInterception(true)
+  page.on('request', async request => {
+    if (
+      ['image', 'stylesheet', 'font', 'script'].includes(request.resourceType())
+    ) {
+      // tslint:disable-next-line: no-floating-promises
+      request.abort()
+    } else {
+      // tslint:disable-next-line: no-floating-promises
+      request.continue()
+    }
+  })
+  return page
 }
 
 // functions
@@ -70,14 +83,21 @@ export const subFortune = functions
     memory: '1GB'
   })
   .pubsub.topic(TOPIC_SCRAPING_FORTUNE)
-  .onPublish(async (message, context) => {
+  .onPublish(async (message, _) => {
     const messageData: ScrapingFortuneMessage = message.json
 
     const page = await getNewPage()
     try {
-      const details = await fortune.getFortune(page, messageData)
-      console.info(JSON.stringify(details, undefined, 1))
-      const results = aggregator.aggregate(details)
+      const { isSuccess, errorMessage } = await fortune.login(page, messageData.email, messageData.password)
+      if (!isSuccess) {
+        console.error(errorMessage)
+      }
+      const entryList = await fortune.getEntryList(page)
+      for (const entry of entryList) {
+        entry.details = await fortune.getEntryDetail(page, entry.detailPageURL)
+      }
+      console.info(JSON.stringify(entryList, undefined, 1))
+      const results = aggregator.aggregateEntry(entryList)
       console.info(JSON.stringify(results, undefined, 1))
       await db
         .collection('users')
