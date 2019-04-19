@@ -1,6 +1,6 @@
 export const entryList: EntryListData[] = [
   {
-    "detailPageURL": "https://fortunemusic.jp/mypage/entry_detail/3158014/",
+    "detailURL": "https://fortunemusic.jp/mypage/entry_detail/3158014/",
     "entryNumber": "75-4905-6107465-00",
     "entryDate": "申込日時2019-04-11 21:16:38",
     "totalAmount": "合計請求額32,010円",
@@ -69,7 +69,7 @@ export const entryList: EntryListData[] = [
     ]
   },
   {
-    "detailPageURL": "https://fortunemusic.jp/mypage/entry_detail/3154265/",
+    "detailURL": "https://fortunemusic.jp/mypage/entry_detail/3154265/",
     "entryNumber": "75-4904-6102823-00",
     "entryDate": "申込日時2019-04-04 23:24:58",
     "totalAmount": "合計請求額49,860円",
@@ -180,7 +180,7 @@ export const entryList: EntryListData[] = [
     ]
   },
   {
-    "detailPageURL": "https://fortunemusic.jp/mypage/entry_detail/3093074/",
+    "detailURL": "https://fortunemusic.jp/mypage/entry_detail/3093074/",
     "entryNumber": "75-4771-5982015-00",
     "entryDate": "申込日時2019-03-01 07:54:08",
     "totalAmount": "合計請求額37,800円",
@@ -261,7 +261,7 @@ export const entryList: EntryListData[] = [
     ]
   },
   {
-    "detailPageURL": "https://fortunemusic.jp/mypage/entry_detail/3081176/",
+    "detailURL": "https://fortunemusic.jp/mypage/entry_detail/3081176/",
     "entryNumber": "75-4769-5934159-00",
     "entryDate": "申込日時2019-02-21 22:16:36",
     "totalAmount": "合計請求額56,700円",
@@ -390,7 +390,7 @@ export const entryList: EntryListData[] = [
     ]
   },
   {
-    "detailPageURL": "https://fortunemusic.jp/mypage/entry_detail/3061930/",
+    "detailURL": "https://fortunemusic.jp/mypage/entry_detail/3061930/",
     "entryNumber": "75-4767-5903914-00",
     "entryDate": "申込日時2019-02-14 23:25:29",
     "totalAmount": "合計請求額15,210円",
@@ -441,7 +441,7 @@ export const entryList: EntryListData[] = [
     ]
   },
   {
-    "detailPageURL": "https://fortunemusic.jp/mypage/entry_detail/3039524/",
+    "detailURL": "https://fortunemusic.jp/mypage/entry_detail/3039524/",
     "entryNumber": "75-4695-5875056-00",
     "entryDate": "申込日時2019-02-08 00:06:32",
     "totalAmount": "合計請求額7,350円",
@@ -468,7 +468,7 @@ export const entryList: EntryListData[] = [
     ]
   },
   {
-    "detailPageURL": "https://fortunemusic.jp/mypage/entry_detail/3021876/",
+    "detailURL": "https://fortunemusic.jp/mypage/entry_detail/3021876/",
     "entryNumber": "75-4694-5852143-00",
     "entryDate": "申込日時2019-01-31 22:32:18",
     "totalAmount": "合計請求額46,200円",
@@ -573,7 +573,7 @@ export const entryList: EntryListData[] = [
     ]
   },
   {
-    "detailPageURL": "https://fortunemusic.jp/mypage/entry_detail/2991945/",
+    "detailURL": "https://fortunemusic.jp/mypage/entry_detail/2991945/",
     "entryNumber": "75-4693-5797422-00",
     "entryDate": "申込日時2019-01-24 20:28:30",
     "totalAmount": "合計請求額34,110円",
@@ -648,7 +648,7 @@ export const entryList: EntryListData[] = [
     ]
   },
   {
-    "detailPageURL": "https://fortunemusic.jp/mypage/entry_detail/2869186/",
+    "detailURL": "https://fortunemusic.jp/mypage/entry_detail/2869186/",
     "entryNumber": "75-4402-5617649-00",
     "entryDate": "申込日時2018-10-05 12:56:26",
     "totalAmount": "合計請求額8,910円",
@@ -675,7 +675,7 @@ export const entryList: EntryListData[] = [
     ]
   },
   {
-    "detailPageURL": "https://fortunemusic.jp/mypage/entry_detail/2774817/",
+    "detailURL": "https://fortunemusic.jp/mypage/entry_detail/2774817/",
     "entryNumber": "75-4287-5422641-00",
     "entryDate": "申込日時2018-08-30 21:01:05",
     "totalAmount": "合計請求額29,910円",
@@ -780,7 +780,7 @@ export const entryList: EntryListData[] = [
     ]
   },
   {
-    "detailPageURL": "https://fortunemusic.jp/mypage/entry_detail/2739172/",
+    "detailURL": "https://fortunemusic.jp/mypage/entry_detail/2739172/",
     "entryNumber": "75-4121-5367536-00",
     "entryDate": "申込日時2018-08-02 20:07:13",
     "totalAmount": "合計請求額14,510円",
@@ -801,7 +801,7 @@ export const entryList: EntryListData[] = [
     ]
   },
   {
-    "detailPageURL": "https://fortunemusic.jp/mypage/entry_detail/2729493/",
+    "detailURL": "https://fortunemusic.jp/mypage/entry_detail/2729493/",
     "entryNumber": "75-4117-5361425-00",
     "entryDate": "申込日時2018-07-27 13:45:10",
     "totalAmount": "合計請求額8,400円",
@@ -834,7 +834,7 @@ export const entryList: EntryListData[] = [
     ]
   },
   {
-    "detailPageURL": "https://fortunemusic.jp/mypage/entry_detail/2705357/",
+    "detailURL": "https://fortunemusic.jp/mypage/entry_detail/2705357/",
     "entryNumber": "75-4116-5274691-00",
     "entryDate": "申込日時2018-07-20 00:15:35",
     "totalAmount": "合計請求額22,050円",
@@ -909,7 +909,7 @@ export const entryList: EntryListData[] = [
     ]
   },
   {
-    "detailPageURL": "https://fortunemusic.jp/mypage/entry_detail/2676225/",
+    "detailURL": "https://fortunemusic.jp/mypage/entry_detail/2676225/",
     "entryNumber": "75-4113-5146639-00",
     "entryDate": "申込日時2018-07-13 00:09:18",
     "totalAmount": "合計請求額3,150円",
@@ -924,7 +924,7 @@ export const entryList: EntryListData[] = [
     ]
   },
   {
-    "detailPageURL": "https://fortunemusic.jp/mypage/entry_detail/2676205/",
+    "detailURL": "https://fortunemusic.jp/mypage/entry_detail/2676205/",
     "entryNumber": "75-4112-5146512-00",
     "entryDate": "申込日時2018-07-13 00:08:08",
     "totalAmount": "合計請求額33,060円",
@@ -1011,7 +1011,7 @@ export const entryList: EntryListData[] = [
     ]
   },
   {
-    "detailPageURL": "https://fortunemusic.jp/mypage/entry_detail/2609424/",
+    "detailURL": "https://fortunemusic.jp/mypage/entry_detail/2609424/",
     "entryNumber": "75-4039-4994521-00",
     "entryDate": "申込日時2018-06-22 12:36:24",
     "totalAmount": "合計請求額6,810円",
@@ -1032,7 +1032,7 @@ export const entryList: EntryListData[] = [
     ]
   },
   {
-    "detailPageURL": "https://fortunemusic.jp/mypage/entry_detail/2576448/",
+    "detailURL": "https://fortunemusic.jp/mypage/entry_detail/2576448/",
     "entryNumber": "75-3962-4946936-00",
     "entryDate": "申込日時2018-06-14 12:25:50",
     "totalAmount": "合計請求額3,660円",
@@ -1053,7 +1053,7 @@ export const entryList: EntryListData[] = [
     ]
   },
   {
-    "detailPageURL": "https://fortunemusic.jp/mypage/entry_detail/2541593/",
+    "detailURL": "https://fortunemusic.jp/mypage/entry_detail/2541593/",
     "entryNumber": "75-3876-4852911-00",
     "entryDate": "申込日時2018-05-11 08:02:56",
     "totalAmount": "合計請求額31,310円",
@@ -1098,7 +1098,7 @@ export const entryList: EntryListData[] = [
     ]
   },
   {
-    "detailPageURL": "https://fortunemusic.jp/mypage/entry_detail/2496665/",
+    "detailURL": "https://fortunemusic.jp/mypage/entry_detail/2496665/",
     "entryNumber": "75-3780-4795991-00",
     "entryDate": "申込日時2018-03-30 12:27:14",
     "totalAmount": "合計請求額3,660円",
@@ -1113,7 +1113,7 @@ export const entryList: EntryListData[] = [
     ]
   },
   {
-    "detailPageURL": "https://fortunemusic.jp/mypage/entry_detail/2438650/",
+    "detailURL": "https://fortunemusic.jp/mypage/entry_detail/2438650/",
     "entryNumber": "75-3702-4668973-00",
     "entryDate": "申込日時2018-03-02 11:34:34",
     "totalAmount": "合計請求額6,810円",
@@ -1134,7 +1134,7 @@ export const entryList: EntryListData[] = [
     ]
   },
   {
-    "detailPageURL": "https://fortunemusic.jp/mypage/entry_detail/2390309/",
+    "detailURL": "https://fortunemusic.jp/mypage/entry_detail/2390309/",
     "entryNumber": "75-3671-4608647-00",
     "entryDate": "申込日時2018-02-23 12:18:38",
     "totalAmount": "合計請求額2,610円",
@@ -1155,7 +1155,7 @@ export const entryList: EntryListData[] = [
     ]
   },
   {
-    "detailPageURL": "https://fortunemusic.jp/mypage/entry_detail/2372226/",
+    "detailURL": "https://fortunemusic.jp/mypage/entry_detail/2372226/",
     "entryNumber": "75-3670-4571792-00",
     "entryDate": "申込日時2018-02-15 21:49:34",
     "totalAmount": "合計請求額4,200円",
@@ -1188,7 +1188,7 @@ export const entryList: EntryListData[] = [
     ]
   },
   {
-    "detailPageURL": "https://fortunemusic.jp/mypage/entry_detail/2310620/",
+    "detailURL": "https://fortunemusic.jp/mypage/entry_detail/2310620/",
     "entryNumber": "75-3633-4536283-00",
     "entryDate": "申込日時2018-02-09 03:11:22",
     "totalAmount": "合計請求額21,510円",
@@ -1251,7 +1251,7 @@ export const entryList: EntryListData[] = [
     ]
   },
   {
-    "detailPageURL": "https://fortunemusic.jp/mypage/entry_detail/2297556/",
+    "detailURL": "https://fortunemusic.jp/mypage/entry_detail/2297556/",
     "entryNumber": "75-3603-4481361-00",
     "entryDate": "申込日時2018-01-18 23:47:31",
     "totalAmount": "合計請求額6,810円",
@@ -1272,7 +1272,7 @@ export const entryList: EntryListData[] = [
     ]
   },
   {
-    "detailPageURL": "https://fortunemusic.jp/mypage/entry_detail/2265462/",
+    "detailURL": "https://fortunemusic.jp/mypage/entry_detail/2265462/",
     "entryNumber": "75-3442-4430333-00",
     "entryDate": "申込日時2017-12-01 07:47:32",
     "totalAmount": "合計請求額4,010円",
@@ -1287,7 +1287,7 @@ export const entryList: EntryListData[] = [
     ]
   },
   {
-    "detailPageURL": "https://fortunemusic.jp/mypage/entry_detail/2218980/",
+    "detailURL": "https://fortunemusic.jp/mypage/entry_detail/2218980/",
     "entryNumber": "75-3369-4366399-00",
     "entryDate": "申込日時2017-10-27 12:12:30",
     "totalAmount": "合計請求額1,560円",

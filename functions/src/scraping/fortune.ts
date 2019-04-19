@@ -2,6 +2,7 @@ import { Page } from 'puppeteer'
 
 const LOGIN_URL = 'https://fortunemusic.jp/default/login/'
 const ENTRY_LIST_URL = 'https://fortunemusic.jp/mypage/entry_list/'
+const APPLY_LIST_URL = 'https://fortunemusic.jp/mypage/apply_list/'
 
 const logging = async (page: Page) => {
   // await page.screenshot({ path: Date.now() + ".png", fullpage: true });
@@ -45,7 +46,7 @@ const getEntryListData = async (page: Page) => {
   return page.evaluate(() =>
     Array.from(document.querySelectorAll('table > tbody > tr')).map(tr => {
       const td1 = tr.querySelector('td:nth-child(1) > a') as A
-      const detailPageURL = td1.href
+      const detailURL = td1.href
       const entryNumber = td1.textContent!
       const entryDate = tr.querySelector('td:nth-child(2)')!.textContent!
       const totalAmount = tr.querySelector('td:nth-child(3)')!.textContent!
@@ -53,7 +54,7 @@ const getEntryListData = async (page: Page) => {
       const details: EntryDetail[] = []
 
       const result: EntryListData = {
-        detailPageURL,
+        detailURL,
         entryNumber,
         entryDate,
         totalAmount,
@@ -107,4 +108,126 @@ export const getEntryList = async (page: Page, url = ENTRY_LIST_URL) => {
   }
 
   return entryListData
+}
+
+const getApplyListData = async (page: Page) => {
+  await logging(page)
+  return page.evaluate(() =>
+    Array.from(document.querySelectorAll('table > tbody > tr')).map(tr => {
+      const td1 = tr.querySelector('td:nth-child(1) > a') as A
+      const detailURL = td1.href
+      const applicationNumber = td1.textContent!
+      const applicationDate = tr.querySelector('td:nth-child(2)')!.textContent!
+      const applicationTotalAmount = tr.querySelector('td:nth-child(3)')!.textContent!
+      const eventName = tr.querySelector('td:nth-child(4)')!.textContent!
+      const lotteryState = tr.querySelector('td:nth-child(5)')!.textContent!
+      const lotteryResult = tr.querySelector('td:nth-child(6)')!.textContent!
+      const details: ApplyDetail[] = []
+      const isLotteryCompleted = lotteryState.indexOf("未抽選") === -1
+
+      const result: ApllyListData = {
+        detailURL,
+        applicationNumber,
+        applicationDate,
+        applicationTotalAmount,
+        eventName,
+        lotteryState,
+        lotteryResult,
+        isLotteryCompleted,
+        details
+      }
+      return result
+    })
+  )
+}
+
+export const getApplyList = async (page: Page, url = APPLY_LIST_URL) => {
+  await page.waitFor(1000)
+  await page.goto(url, { waitUntil: 'domcontentloaded' })
+  const applyListData = await getApplyListData(page)
+  const nextPageURL = await page.evaluate(() => {
+    const a: A | null = document.querySelector('p.pageNext > a')
+    if (a !== null) {
+      return a.href
+    }
+    return null
+  })
+
+  if (nextPageURL !== null) {
+    applyListData.push(...(await getApplyList(page, nextPageURL)))
+  }
+
+  return applyListData
+}
+
+export const getApplyDetailBeforeLottery = async (page: Page, url: string) => {
+  await page.waitFor(1000)
+  await page.goto(url, { waitUntil: 'domcontentloaded' })
+  await logging(page)
+  return (await page.evaluate(() =>
+    Array.from(document.querySelectorAll('table > tbody > tr'))
+      .slice(1) // ページ上部に抽選状況のテーブルがある
+      .map(tr => {
+        // ex:"星野みなみ【7/28 神奈川 第１部】乃木坂46 23rdシングル発売記念 個別握手会"
+        const itemName = tr.querySelector('td:nth-child(1)')!.textContent!
+        // ex:"1,050円"
+        const unitPrice = tr.querySelector('td:nth-child(2)')!.textContent!
+        // ex:"3個"
+        const applicationQuantity = tr.querySelector('td:nth-child(3)')!.textContent!
+
+        const reslut: ApplyDetail = {
+          itemName,
+          unitPrice,
+          applicationQuantity,
+          winningQuantity: '',
+          subtotal: ''
+        }
+        return reslut
+      })
+  ))
+}
+
+export const getApplyDetailAfterLottery = async (page: Page, url: string) => {
+  await page.waitFor(1000)
+  await page.goto(url, { waitUntil: 'domcontentloaded' })
+  await logging(page)
+  return (await page.evaluate(() =>
+    Array.from(document.querySelectorAll('table > tbody > tr'))
+      .slice(1) // ページ上部に抽選状況のテーブルがある
+      .slice(0, -2) // テーブルのフッター部分を除去
+      .map(tr => {
+        // ex:"星野みなみ【7/28 神奈川 第１部】乃木坂46 23rdシングル発売記念 個別握手会"
+        const itemName = tr.querySelector('td:nth-child(1)')!.textContent!
+        // ex:"1,050円"
+        const unitPrice = tr.querySelector('td:nth-child(2)')!.textContent!
+        // ex:"3個"
+        const applicationQuantity = tr.querySelector('td:nth-child(3)')!.textContent!
+        const td4 = tr.querySelector('td:nth-child(4)')
+        let winningQuantity: string
+        if (td4 !== null) {
+          // ex:"3個"
+          winningQuantity = td4.textContent!
+        } else {
+          winningQuantity = ''
+        }
+        const td5 = tr.querySelector('td:nth-child(5)')
+        let subtotal: string
+        if (td5 !== null) {
+          // ex:"3,150円"
+          subtotal = td5.textContent!
+        } else {
+          subtotal = ''
+        }
+
+        const reslut: ApplyDetail = {
+          itemName,
+          unitPrice,
+          applicationQuantity,
+          winningQuantity,
+          subtotal
+        }
+
+        return reslut
+      })
+  ))
 }

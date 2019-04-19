@@ -5,7 +5,7 @@ interface ScrapingFortuneMessage {
 }
 
 interface EntryListData {
-  detailPageURL: string
+  detailURL: string
   entryNumber: string
   entryDate: string
   totalAmount: string
@@ -17,6 +17,26 @@ interface EntryDetail {
   itemName: string
   unitPrice: string
   quantity: string
+  subtotal: string
+}
+
+interface ApllyListData {
+  detailURL: string
+  applicationNumber: string
+  applicationDate: string
+  applicationTotalAmount: string
+  eventName: string
+  lotteryState: string
+  lotteryResult: string
+  isLotteryCompleted: boolean
+  details: ApplyDetail[]
+}
+
+interface ApplyDetail {
+  itemName: string
+  unitPrice: string
+  applicationQuantity: string
+  winningQuantity: string
   subtotal: string
 }
 

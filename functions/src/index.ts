@@ -94,7 +94,7 @@ export const subFortune = functions
       }
       const entryList = await fortune.getEntryList(page)
       for (const entry of entryList) {
-        entry.details = await fortune.getEntryDetail(page, entry.detailPageURL)
+        entry.details = await fortune.getEntryDetail(page, entry.detailURL)
       }
       console.info(JSON.stringify(entryList, undefined, 1))
       const results = aggregator.aggregateEntry(entryList)

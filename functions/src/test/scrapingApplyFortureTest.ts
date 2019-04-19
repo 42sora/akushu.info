@@ -34,12 +34,15 @@ const getNewPage = async () => {
   const { isSuccess, errorMessage } = await fortune.login(page, email, password)
   console.info(JSON.stringify(isSuccess, undefined, 1))
   console.info(JSON.stringify(errorMessage, undefined, 1))
-  const entryList = await fortune.getEntryList(page)
-  console.info(JSON.stringify(entryList, undefined, 1))
-  for (const entry of entryList) {
-    entry.details = await fortune.getEntryDetail(page, entry.detailPageURL)
+  const applyList = await fortune.getApplyList(page)
+  console.info(JSON.stringify(applyList, undefined, 1))
+  for (const apply of applyList) {
+    if (apply.isLotteryCompleted) {
+      apply.details = await fortune.getApplyDetailAfterLottery(page, apply.detailURL)
+    } else {
+      apply.details = await fortune.getApplyDetailBeforeLottery(page, apply.detailURL)
+    }
   }
-  console.info(JSON.stringify(entryList, undefined, 1))
-
+  console.info(JSON.stringify(applyList, undefined, 1))
 
 })()
