@@ -1,26 +1,75 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import { firestore } from './firebaseConfig'
+import { aggregateEntry } from './utils/FortuneAggregator'
 import { compareDateStr } from './utils/DateStrComparer'
 
 Vue.use(Vuex)
 
+let unsubscribe
+
 export default new Vuex.Store({
   state: {
-    user: { uid: null },
-    fortune: []
-  },
-  mutations: {
-    setFortune (state, fortune) {
-      state.fortune = fortune.sort((a, b) => compareDateStr(a.eventDate, b.eventDate))
-    },
-    signIn (state, payload) {
-      console.log('commit:signIn')
-      state.user = payload.user
-    },
-    signOut (state) {
-      console.log('commit:signOut')
-      state.user = { uid: null }
+    auth: { uid: null },
+    user: {
+      fortune: {
+        entryList: [],
+        applyList: []
+      },
+      scrapingState: {}
     }
   },
-  actions: {}
+  getters: {
+    myEventList: state => {
+      const entryList = state.user.fortune.entryList
+      if (!entryList) return []
+
+      const eventList = aggregateEntry(entryList)
+      return eventList.sort((a, b) => compareDateStr(a.eventDate, b.eventDate))
+    }
+  },
+  mutations: {
+    clear (state) {
+      state.user = { uid: null }
+      state.auth = {
+        fortune: {
+          entryList: [],
+          applyList: []
+        },
+        scrapingState: {}
+      }
+    },
+    setUser (state, payload) {
+      console.debug('commit:setUser')
+      state.user = payload
+    },
+    setAuth (state, payload) {
+      console.debug('commit:setAuth')
+      state.auth = payload
+    }
+  },
+  actions: {
+    signIn ({ commit }, auth) {
+      commit('setAuth', auth)
+      // 2重でsubscribeされるのを防ぐ
+      if (unsubscribe != null) {
+        unsubscribe()
+      }
+      unsubscribe = firestore.collection('users')
+        .doc(auth.uid)
+        .onSnapshot(snapshot => {
+          console.debug(snapshot)
+          const user = snapshot.data()
+          if (user == null) { return }
+
+          commit('setUser', user)
+        })
+    },
+    signOut ({ commit }) {
+      commit('clear')
+      if (unsubscribe != null) {
+        unsubscribe()
+      }
+    }
+  }
 })

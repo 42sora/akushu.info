@@ -56,7 +56,7 @@ export default {
   methods: {
     async signOut () {
       await this.$auth.signOut()
-      this.$store.commit('signOut')
+      this.$store.dispatch('signOut')
       this.$router.push('/signin')
     }
   }

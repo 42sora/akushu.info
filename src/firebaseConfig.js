@@ -11,7 +11,8 @@ const config = {
 }
 firebase.initializeApp(config)
 
+export const firestore = firebase.firestore()
 // extend prototype of Vue
-Vue.prototype.$firestore = firebase.firestore()
+Vue.prototype.$firestore = firestore
 Vue.prototype.$functions = firebase.app().functions('asia-northeast1')
 Vue.prototype.$auth = firebase.auth()

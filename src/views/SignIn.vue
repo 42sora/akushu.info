@@ -18,9 +18,9 @@ export default {
     return { isLoading: true }
   },
   created () {
-    const unsubscribe = this.$auth.onAuthStateChanged((user) => {
-      if (user) {
-        this.$store.commit('signIn', { user: user })
+    const unsubscribe = this.$auth.onAuthStateChanged((auth) => {
+      if (auth != null) {
+        this.$store.dispatch('signIn', auth)
         this.$router.push('/')
       }
     })
@@ -34,7 +34,7 @@ export default {
     ui.start('#firebaseui-auth-container', {
       callbacks: {
         signInSuccessWithAuthResult: (authResult, redirectUrl) => {
-          this.$store.commit('signIn', { user: authResult.user })
+          this.$store.dispatch('signIn', { user: authResult.user })
           this.$router.push('/')
           return false
         },

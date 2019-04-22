@@ -2,7 +2,6 @@ import * as functions from 'firebase-functions'
 import * as admin from 'firebase-admin'
 import * as puppeteer from 'puppeteer'
 import * as fortune from './scraping/fortune'
-import * as aggregator from './aggregator/fortuneAggregator'
 
 // firestore
 admin.initializeApp(functions.config().firebase)
@@ -125,13 +124,9 @@ export const subFortune = functions
       console.info(JSON.stringify(applyList, undefined, 1))
       const setApplyList = userStore.set({ fortune: { applyList } }, { merge: true })
 
-      const results = aggregator.aggregateEntry(entryList)
-      console.info(JSON.stringify(results, undefined, 1))
-      const setAggregate = userStore.set({ fortuneAggregateData: results }, { merge: true })
-
       const setState = userStore
         .set({ scrapingState: { state: 'COMPLETED' } }, { merge: true })
-      await Promise.all([setEntryList, setApplyList, setAggregate, setState])
+      await Promise.all([setEntryList, setApplyList, setState])
     } catch (e) {
       console.error(e)
       await userStore.set(

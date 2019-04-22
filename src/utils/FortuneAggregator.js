@@ -1,4 +1,4 @@
-const ticketsMerge = (array: Ticket[], addObj: Ticket) => {
+const ticketsMerge = (array, addObj) => {
   let exists = false
   for (const src of array) {
     if (
@@ -13,7 +13,7 @@ const ticketsMerge = (array: Ticket[], addObj: Ticket) => {
     array.push(addObj)
   }
 }
-const merge = (array: FortuneEvent[], addObj: FortuneEvent) => {
+const merge = (array, addObj) => {
   let exists = false
   for (const src of array) {
     if (
@@ -37,13 +37,13 @@ const merge = (array: FortuneEvent[], addObj: FortuneEvent) => {
  * @param {string} entryDate 申込日時(ex: "2018-01-01")
  * @param {string} eventMonthDay イベント開催月日(ex: "7/16")
  */
-const toEventDate = (entryDateStr: string, eventMonthDay: string) => {
+const toEventDate = (entryDateStr, eventMonthDay) => {
   const [entryYear, entryMonth, entryDay] = entryDateStr
     .split('-').map(s => parseInt(s))
   const [eventMonth, eventDay] = eventMonthDay
     .split('/').map(s => parseInt(s))
 
-  let eventYear: number
+  let eventYear
   // イベント開催月日が申込日時より過去であれば翌年開催ということ。(1年以上先のイベントは算出できないけどしょうがない)
   if (
     eventMonth > entryMonth ||
@@ -56,15 +56,15 @@ const toEventDate = (entryDateStr: string, eventMonthDay: string) => {
   return eventYear + '-' + eventMonth + '-' + eventDay
 }
 
-const normalizePartName = (partName: string) => {
+const normalizePartName = (partName) => {
   if (partName.startsWith('第')) {
     return partName.substring(1)
   }
   return partName
 }
 
-const toEvent = (entry: EntryListData, detail: EntryDetail) => {
-  const entryDate = /[0-9]{4}-[0-9]{2}-[0-9]{2}/.exec(entry.entryDate)![0]
+const toEvent = (entry, detail) => {
+  const entryDate = /[0-9]{4}-[0-9]{2}-[0-9]{2}/.exec(entry.entryDate)[0]
 
   const itemName = detail.itemName
   const memberName = itemName.substring(0, itemName.indexOf('【'))
@@ -74,11 +74,11 @@ const toEvent = (entry: EntryListData, detail: EntryDetail) => {
   const eventDate = toEventDate(entryDate, bracketed[0])
   const eventPlace = bracketed[1]
   const partName = normalizePartName(bracketed[2])
-  const quantity = parseInt(detail.quantity.replace(/[^0-9^\.]/g, ''), 10)
-  const unitPrice = parseInt(detail.unitPrice.replace(/[^0-9^\.]/g, ''), 10)
+  const quantity = parseInt(detail.quantity.replace(/[^0-9^.]/g, ''), 10)
+  const unitPrice = parseInt(detail.unitPrice.replace(/[^0-9^.]/g, ''), 10)
   const ticketAmont = quantity * Math.floor(unitPrice / 1000)
 
-  const reslut: FortuneEvent = {
+  const reslut = {
     eventDate: eventDate,
     eventPlace: eventPlace,
     tickets: [
@@ -92,8 +92,8 @@ const toEvent = (entry: EntryListData, detail: EntryDetail) => {
   return reslut
 }
 
-export const aggregateEntry = (entryList: EntryListData[]) => {
-  const resluts: FortuneEvent[] = []
+export const aggregateEntry = (entryList) => {
+  const resluts = []
   for (const entry of entryList) {
     for (const detail of entry.details) {
       merge(resluts, toEvent(entry, detail))

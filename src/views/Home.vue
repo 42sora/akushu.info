@@ -99,11 +99,8 @@ export default {
     }
   },
   computed: {
-    user () {
-      return this.$store.state.user
-    },
     origin () {
-      return this.$store.state.fortune
+      return this.$store.getters.myEventList
     },
     filtered () {
       if (this.filter.length === 0) return this.origin
@@ -135,22 +132,6 @@ export default {
         .flatMap(event => event.tickets.map(x => x.memberName))
         .filter((x, i, self) => self.indexOf(x) === i)
     }
-  },
-  created () {
-    const unsubscribe = this.$firestore.collection('users')
-      .doc(this.user.uid)
-      .onSnapshot(snapshot => {
-        console.log(snapshot)
-        const data = snapshot.data()
-        if (!data) { return }
-
-        const fortune = data.fortuneAggregateData
-        this.$store.commit('setFortune', fortune)
-      })
-
-    this.$once('hook:beforeDestroy', () => {
-      unsubscribe()
-    })
   },
   methods: {
     async startScrapping (event) {
