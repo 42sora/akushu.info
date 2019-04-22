@@ -28,6 +28,10 @@
           </div>
         </div>
       </div>
+      <scraping-progress
+        class="box"
+        :scraping-state="scrapingState"
+      />
       <member-filter
         v-if="members.length>0"
         class="box"
@@ -80,6 +84,7 @@ import MainNav from '@/components/MainNav'
 import AkuTable from '@/components/AkuTable'
 import FortuneLoginForm from '@/components/FortuneLoginForm'
 import MemberFilter from '@/components/MemberFilter'
+import ScrapingProgress from '@/components/ScrapingProgress'
 
 const getNowDateStr = () => {
   const now = new Date()
@@ -91,7 +96,7 @@ const getNowDateStr = () => {
 
 export default {
   name: 'Home',
-  components: { MainNav, AkuTable, FortuneLoginForm, MemberFilter },
+  components: { MainNav, AkuTable, FortuneLoginForm, MemberFilter, ScrapingProgress },
   data: function () {
     return {
       isFortuneLogin: false,
@@ -131,6 +136,9 @@ export default {
       return this.originEvents
         .flatMap(event => event.tickets.map(x => x.memberName))
         .filter((x, i, self) => self.indexOf(x) === i)
+    },
+    scrapingState () {
+      return this.$store.state.user.scrapingState
     }
   },
   methods: {
