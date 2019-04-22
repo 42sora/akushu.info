@@ -23,11 +23,17 @@
       </p>
     </template>
     <template v-else-if="isCompleted">
+      <span class="has-text-grey">
+        {{ lastUpdated }}
+      </span>
       <p class="has-text-success">
         データ取得が完了しました。
       </p>
     </template>
     <template v-else-if="isLoginFailed">
+      <span class="has-text-grey">
+        {{ lastUpdated }}
+      </span>
       <p class="has-text-danger">
         forTUNE musicへのログインに失敗しました。<br>
         forTUNE musicにて以下のメッセージが表示されています。
@@ -44,6 +50,9 @@
       </article>
     </template>
     <template v-else-if="isSystemError">
+      <span class="has-text-grey">
+        {{ lastUpdated }}
+      </span>
       <p class="has-text-danger">
         エラーが発生しました。<br>
         お手数ですが、もう一度やり直してください。
@@ -75,6 +84,16 @@ export default {
     },
     errorMessage () {
       return this.scrapingState.errorMessage
+    },
+    lastUpdated () {
+      const date = this.scrapingState.updatedAt.toDate()
+      const year = date.getFullYear()
+      const month = date.getMonth() + 1
+      const day = date.getDate()
+      const hours = date.getHours()
+      const minutes = date.getMinutes()
+      const seconds = date.getSeconds()
+      return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds
     }
   }
 }
