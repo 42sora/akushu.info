@@ -99,12 +99,12 @@ export default {
     }
   },
   computed: {
-    origin () {
+    originEvents () {
       return this.$store.getters.myEventList
     },
-    filtered () {
-      if (this.filter.length === 0) return this.origin
-      return this.origin
+    filteredEvents () {
+      if (this.filter.length === 0) return this.originEvents
+      return this.originEvents
         .map(event => {
           return {
             eventDate: event.eventDate,
@@ -118,17 +118,17 @@ export default {
     },
     futureEvtnts () {
       const nowDateStr = getNowDateStr()
-      return this.filtered
+      return this.filteredEvents
         .filter(event => !isPast(event.eventDate, nowDateStr))
     },
     pastEvents () {
       const nowDateStr = getNowDateStr()
-      return this.filtered
+      return this.filteredEvents
         .filter(event => isPast(event.eventDate, nowDateStr))
         .reverse()
     },
     members () {
-      return this.origin
+      return this.originEvents
         .flatMap(event => event.tickets.map(x => x.memberName))
         .filter((x, i, self) => self.indexOf(x) === i)
     }

@@ -1,35 +1,30 @@
-const ticketsMerge = (array, addObj) => {
+const ticketsMerge = (tickets, addTicket) => {
   let exists = false
-  for (const src of array) {
-    if (
-      src.memberName === addObj.memberName &&
-      src.partName === addObj.partName
-    ) {
+  for (const src of tickets) {
+    if (src.memberName === addTicket.memberName &&
+      src.partName === addTicket.partName) {
       exists = true
-      src.amont += addObj.amont
+      src.amont += addTicket.amont
     }
   }
   if (!exists) {
-    array.push(addObj)
+    tickets.push(addTicket)
   }
 }
-const merge = (array, addObj) => {
+const merge = (events, addEvent) => {
   let exists = false
-  for (const src of array) {
-    if (
-      src.eventDate === addObj.eventDate &&
-      src.eventPlace === addObj.eventPlace
-    ) {
+  for (const src of events) {
+    if (src.eventDate === addEvent.eventDate &&
+      src.eventPlace === addEvent.eventPlace) {
       exists = true
-      for (const addTicket of addObj.tickets) {
+      for (const addTicket of addEvent.tickets) {
         ticketsMerge(src.tickets, addTicket)
       }
     }
   }
   if (!exists) {
-    array.push(addObj)
+    events.push(addEvent)
   }
-  return array
 }
 
 /**
