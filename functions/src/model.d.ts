@@ -52,6 +52,8 @@ interface Ticket {
   amont: number
 }
 
+type State = 'WAITING' | 'EXECUTING' | 'COMPLETED' | 'LOGIN_FAILED' | 'SYSTEM_ERROR'
+
 interface A extends Element {
   href: string
 }

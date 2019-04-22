@@ -94,15 +94,27 @@ export const subFortune = functions
       .collection('users')
       .doc(messageData.uid)
 
+    const setState = async (state: State, errorMessage = '') =>
+      userStore.set(
+        {
+          scrapingState: {
+            state: state,
+            errorMessage: errorMessage,
+            updatedAt: admin.firestore.FieldValue.serverTimestamp()
+          }
+        },
+        { merge: true }
+      )
+
     // tslint:disable-next-line: no-floating-promises
-    userStore.set({ scrapingState: { state: 'EXECUTING' } }, { merge: true })
+    setState('EXECUTING')
 
     const page = await getNewPage()
     try {
       const { isSuccess, errorMessage } = await fortune.login(page, messageData.email, messageData.password)
       if (!isSuccess) {
         console.error(errorMessage)
-        await userStore.set({ scrapingState: { state: 'LOGIN_FAILED', errorMessage } }, { merge: true })
+        await setState('LOGIN_FAILED', errorMessage)
         return
       }
 
@@ -111,7 +123,7 @@ export const subFortune = functions
         entry.details = await fortune.getEntryDetail(page, entry.detailURL)
       }
       console.info(JSON.stringify(entryList, undefined, 1))
-      const setEntryList = userStore.set({ fortune: { entryList } }, { merge: true })
+      const promises = [userStore.set({ fortune: { entryList } }, { merge: true })]
 
       const applyList = await fortune.getApplyList(page)
       for (const apply of applyList) {
@@ -122,21 +134,13 @@ export const subFortune = functions
         }
       }
       console.info(JSON.stringify(applyList, undefined, 1))
-      const setApplyList = userStore.set({ fortune: { applyList } }, { merge: true })
+      promises.push(userStore.set({ fortune: { applyList } }, { merge: true }))
 
-      const setState = userStore
-        .set({ scrapingState: { state: 'COMPLETED' } }, { merge: true })
-      await Promise.all([setEntryList, setApplyList, setState])
+      promises.push(setState('COMPLETED'))
+      await Promise.all(promises)
     } catch (e) {
       console.error(e)
-      await userStore.set(
-        {
-          scrapingState: {
-            state: 'SYSTEM_ERROR',
-            errorMessage: JSON.stringify(e, undefined, 1)
-          }
-        }, { merge: true }
-      )
+      await setState('SYSTEM_ERROR', JSON.stringify(e, undefined, 1))
       throw e
     } finally {
       await page.close()
