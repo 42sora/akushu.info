@@ -63,11 +63,15 @@ const normalizePartName = (partName) => {
   return partName
 }
 
+const normalizeMemberName = (memberName) => {
+  return memberName.replace(/\s+/g, '')
+}
+
 const toEvent = (entry, detail) => {
   const entryDate = /[0-9]{4}-[0-9]{2}-[0-9]{2}/.exec(entry.entryDate)[0]
 
   const itemName = detail.itemName
-  const memberName = itemName.substring(0, itemName.indexOf('【'))
+  const memberName = normalizeMemberName(itemName.substring(0, itemName.indexOf('【')))
   const bracketed = itemName
     .substring(itemName.indexOf('【') + 1, itemName.indexOf('】'))
     .split(/\s/)
