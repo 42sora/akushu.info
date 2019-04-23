@@ -20,7 +20,6 @@
           aria-haspopup="true"
           aria-controls="dropdown-menu"
         >
-          <!-- @click="isActive=!isActive" -->
           <span>メンバーで絞り込む</span>
           <span class="icon is-small">
             <font-awesome-icon icon="angle-down" />
@@ -47,7 +46,7 @@
     </div>
     <a
       class="button"
-      @click="filter=[]"
+      @click="clear"
     >
       <span class="icon is-small">
         <font-awesome-icon icon="times" />
@@ -77,7 +76,16 @@ export default {
       } else {
         this.filter.push(name)
       }
+    },
+    clear () {
+      this.filter = []
     }
   }
 }
 </script>
+<style>
+.dropdown-content {
+  overflow-y: scroll;
+  max-height: 247px;
+}
+</style>
