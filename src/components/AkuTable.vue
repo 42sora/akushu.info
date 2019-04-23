@@ -80,7 +80,7 @@ export default {
   }
 }
 </script>
-<style>
+<style scoped>
 .no-wrap{
   white-space: nowrap;
 }
