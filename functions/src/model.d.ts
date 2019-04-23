@@ -63,7 +63,7 @@ interface P extends Element {
 }
 
 interface Array<T> {
-  includes(arg: string): boolean
+  includes(arg: T): boolean
 }
 
 interface HTMLCollectionOf<T extends Element> extends HTMLCollectionBase {
