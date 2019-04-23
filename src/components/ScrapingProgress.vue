@@ -94,7 +94,7 @@ export default {
       const hours = padding(date.getHours())
       const minutes = padding(date.getMinutes())
       const seconds = padding(date.getSeconds())
-      return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds
+      return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`
     }
   }
 }
