@@ -1,6 +1,9 @@
 <template>
   <div>
-    <div class="buttons">
+    <div
+      v-if="filter.length>0"
+      class="buttons"
+    >
       <a
         v-for="selectedName in filter"
         :key="selectedName"
