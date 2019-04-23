@@ -95,19 +95,22 @@ export const subFortune = functions
       .doc(messageData.uid)
 
     const setState = async (state: State, errorMessage = '') =>
-      userStore.set(
-        {
-          scrapingState: {
-            state: state,
-            errorMessage: errorMessage,
-            updatedAt: admin.firestore.FieldValue.serverTimestamp()
-          }
-        },
-        { merge: true }
+      userStore.set({
+        scrapingState: {
+          state: state,
+          errorMessage: errorMessage,
+          updatedAt: admin.firestore.FieldValue.serverTimestamp()
+        }
+      }, { merge: true }
       )
 
     // tslint:disable-next-line: no-floating-promises
     setState('EXECUTING')
+
+    // 前回登録したものを取得
+    const userDoc = await userStore.get()
+    const previousEntryList: Entry[] = userDoc.get('fortune.entryList') || []
+    const previousApplyList: Aplly[] = userDoc.get('fortune.applyList') || []
 
     const page = await getNewPage()
     try {
@@ -118,21 +121,27 @@ export const subFortune = functions
         return
       }
 
-      const entryList = await fortune.getEntryList(page)
-      for (const entry of entryList) {
+      const currentEntryList = await fortune.getEntryList(page)
+      const newEntries = currentEntryList
+        .filter(c => !previousEntryList.some(p => p.entryNumber === c.entryNumber))
+      for (const entry of newEntries) {
         entry.details = await fortune.getEntryDetail(page, entry.detailURL)
       }
+      const entryList = previousEntryList.concat(newEntries)
       console.info(JSON.stringify(entryList, undefined, 1))
       const promises = [userStore.set({ fortune: { entryList } }, { merge: true })]
 
-      const applyList = await fortune.getApplyList(page)
-      for (const apply of applyList) {
+      const currentApplyList = await fortune.getApplyList(page)
+      const newApplies = currentApplyList
+        .filter(c => !previousApplyList.some(p => p.applicationNumber === c.applicationNumber))
+      for (const apply of newApplies) {
         if (apply.isLotteryCompleted) {
           apply.details = await fortune.getApplyDetailAfterLottery(page, apply.detailURL)
         } else {
           apply.details = await fortune.getApplyDetailBeforeLottery(page, apply.detailURL)
         }
       }
+      const applyList = previousApplyList.concat(newApplies)
       console.info(JSON.stringify(applyList, undefined, 1))
       promises.push(userStore.set({ fortune: { applyList } }, { merge: true }))
 
