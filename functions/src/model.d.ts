@@ -4,7 +4,7 @@ interface ScrapingFortuneMessage {
   password: string
 }
 
-interface EntryListData {
+interface Entry {
   detailURL: string
   entryNumber: string
   entryDate: string
@@ -20,7 +20,7 @@ interface EntryDetail {
   subtotal: string
 }
 
-interface ApllyListData {
+interface Aplly {
   detailURL: string
   applicationNumber: string
   applicationDate: string

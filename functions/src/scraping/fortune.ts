@@ -53,7 +53,7 @@ const getEntryListData = async (page: Page) => {
       const eventName = tr.querySelector('td:nth-child(4)')!.textContent!
       const details: EntryDetail[] = []
 
-      const result: EntryListData = {
+      const result: Entry = {
         detailURL,
         entryNumber,
         entryDate,
@@ -94,7 +94,7 @@ export const getEntryDetail = async (page: Page, url: string) => {
 export const getEntryList = async (page: Page, url = ENTRY_LIST_URL) => {
   await page.waitFor(1000)
   await page.goto(url, { waitUntil: 'domcontentloaded' })
-  const entryListData = await getEntryListData(page)
+  const entryList = await getEntryListData(page)
   const nextPageURL = await page.evaluate(() => {
     const a: A | null = document.querySelector('p.pageNext > a')
     if (a !== null) {
@@ -104,10 +104,10 @@ export const getEntryList = async (page: Page, url = ENTRY_LIST_URL) => {
   })
 
   if (nextPageURL !== null) {
-    entryListData.push(...(await getEntryList(page, nextPageURL)))
+    entryList.push(...(await getEntryList(page, nextPageURL)))
   }
 
-  return entryListData
+  return entryList
 }
 
 const getApplyListData = async (page: Page) => {
@@ -125,7 +125,7 @@ const getApplyListData = async (page: Page) => {
       const details: ApplyDetail[] = []
       const isLotteryCompleted = lotteryState.indexOf("未抽選") === -1
 
-      const result: ApllyListData = {
+      const result: Aplly = {
         detailURL,
         applicationNumber,
         applicationDate,
@@ -144,7 +144,7 @@ const getApplyListData = async (page: Page) => {
 export const getApplyList = async (page: Page, url = APPLY_LIST_URL) => {
   await page.waitFor(1000)
   await page.goto(url, { waitUntil: 'domcontentloaded' })
-  const applyListData = await getApplyListData(page)
+  const applyList = await getApplyListData(page)
   const nextPageURL = await page.evaluate(() => {
     const a: A | null = document.querySelector('p.pageNext > a')
     if (a !== null) {
@@ -154,10 +154,10 @@ export const getApplyList = async (page: Page, url = APPLY_LIST_URL) => {
   })
 
   if (nextPageURL !== null) {
-    applyListData.push(...(await getApplyList(page, nextPageURL)))
+    applyList.push(...(await getApplyList(page, nextPageURL)))
   }
 
-  return applyListData
+  return applyList
 }
 
 export const getApplyDetailBeforeLottery = async (page: Page, url: string) => {
