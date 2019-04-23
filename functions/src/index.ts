@@ -75,7 +75,14 @@ export const startScraping = functions
     await db
       .collection('users')
       .doc(auth.uid)
-      .set({ scrapingState: { state: 'WAITING' } }, { merge: true })
+      .set({
+        scrapingState: {
+          state: 'WAITING',
+          errorMessage: '',
+          updatedAt: admin.firestore.FieldValue.serverTimestamp()
+        }
+      }, { merge: true }
+      )
 
     return { status: 'OK' }
   })
