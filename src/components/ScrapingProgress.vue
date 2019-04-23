@@ -86,13 +86,14 @@ export default {
       return this.scrapingState.errorMessage
     },
     lastUpdated () {
+      const padding = num => num.toString().padStart(2, '0')
       const date = this.scrapingState.updatedAt.toDate()
       const year = date.getFullYear()
-      const month = date.getMonth() + 1
-      const day = date.getDate()
-      const hours = date.getHours()
-      const minutes = date.getMinutes()
-      const seconds = date.getSeconds()
+      const month = padding(date.getMonth() + 1)
+      const day = padding(date.getDate())
+      const hours = padding(date.getHours())
+      const minutes = padding(date.getMinutes())
+      const seconds = padding(date.getSeconds())
       return year + '-' + month + '-' + day + ' ' + hours + ':' + minutes + ':' + seconds
     }
   }
