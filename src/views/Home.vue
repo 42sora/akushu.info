@@ -8,7 +8,7 @@
             class="button is-primary is-large has-text-weight-semibold modal-button"
             data-target="modal"
             aria-haspopup="true"
-            @click="isFortuneLogin=true"
+            @click="showFortuneLoginForm"
           >
             forTUNE musicにログイン
           </button>
@@ -18,7 +18,7 @@
           >
             <div
               class="modal-background"
-              @click="isFortuneLogin=false"
+              @click="hideFortuneLoginForm"
             />
             <div class="modal-content">
               <div class="box">
@@ -29,9 +29,18 @@
         </div>
       </div>
       <scraping-progress
+        v-if="isScraped"
         class="box"
         :scraping-state="scrapingState"
       />
+      <div
+        v-else
+        class="box"
+      >
+        <p>
+          マイスケジュールを見るには<a @click="showFortuneLoginForm">forTUNE musicへログイン</a>する必要があります。
+        </p>
+      </div>
       <member-filter
         v-if="members.length>0"
         class="box"
@@ -139,9 +148,18 @@ export default {
     },
     scrapingState () {
       return this.$store.state.user.scrapingState
+    },
+    isScraped () {
+      return Object.keys(this.scrapingState).length > 0
     }
   },
   methods: {
+    showFortuneLoginForm () {
+      this.isFortuneLogin = true
+    },
+    hideFortuneLoginForm () {
+      this.isFortuneLogin = false
+    },
     async startScrapping (event) {
       const startScraping = this.$functions.httpsCallable('startScraping')
       const res = await startScraping({ email: event.email, password: event.password })
