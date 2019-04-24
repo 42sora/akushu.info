@@ -30,8 +30,8 @@ export default new Vuex.Store({
   },
   mutations: {
     clear (state) {
-      state.user = { uid: null }
-      state.auth = {
+      state.auth = { uid: null }
+      state.user = {
         fortune: {
           entryList: [],
           applyList: []
