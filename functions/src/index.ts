@@ -130,7 +130,7 @@ export const subFortune = functions
 
       const currentEntryList = await fortune.getEntryList(page)
       const newEntries = currentEntryList
-        .filter(c => !previousEntryList.some(p => p.entryNumber === c.entryNumber))
+        .filter(c => previousEntryList.every(p => p.entryNumber !== c.entryNumber))
       for (const entry of newEntries) {
         entry.details = await fortune.getEntryDetail(page, entry.detailURL)
       }
@@ -140,7 +140,7 @@ export const subFortune = functions
 
       const currentApplyList = await fortune.getApplyList(page)
       const newApplies = currentApplyList
-        .filter(c => !previousApplyList.some(p => p.applicationNumber === c.applicationNumber))
+        .filter(c => previousApplyList.every(p => p.applicationNumber !== c.applicationNumber))
       for (const apply of newApplies) {
         if (apply.isLotteryCompleted) {
           apply.details = await fortune.getApplyDetailAfterLottery(page, apply.detailURL)
@@ -148,7 +148,18 @@ export const subFortune = functions
           apply.details = await fortune.getApplyDetailBeforeLottery(page, apply.detailURL)
         }
       }
-      const applyList = previousApplyList.concat(newApplies)
+      const updatedApplies = currentApplyList
+        .filter(c => previousApplyList.some(p =>
+          p.applicationNumber === c.applicationNumber &&
+          p.isLotteryCompleted !== c.isLotteryCompleted))
+      for (const apply of updatedApplies) {
+        apply.details = await fortune.getApplyDetailAfterLottery(page, apply.detailURL)
+      }
+
+      const applyList = previousApplyList
+        .filter(p => updatedApplies.every(u => u.applicationNumber !== p.applicationNumber))
+        .concat(updatedApplies)
+        .concat(newApplies)
       console.info(JSON.stringify(applyList, undefined, 1))
       promises.push(userStore.set({ fortune: { applyList } }, { merge: true }))
 
