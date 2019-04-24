@@ -231,3 +231,46 @@ export const getApplyDetailAfterLottery = async (page: Page, url: string) => {
       })
   ))
 }
+
+export const getGoodsPageUrl = async (page: Page, eventUrl: string) => {
+  await page.waitFor(1000)
+  await page.goto(eventUrl, { waitUntil: 'domcontentloaded' })
+  await logging(page)
+  return page.evaluate(() => {
+    const a: A | null = document.querySelector('div.itemContent._border > p > a') as A
+    if (a === null) {
+      return null
+    }
+    return a.href
+  })
+}
+
+export const getGoodsList = async (page: Page, url: string) => {
+  await page.waitFor(1000)
+  await page.goto(url, { waitUntil: 'domcontentloaded' })
+  await logging(page)
+  return page.evaluate(() => {
+    const title = document.querySelector('h3')!.textContent
+    const form = document.querySelector('form')!
+    const buttons = Array.from(form.querySelectorAll('button')).map(button => button.textContent)
+    const tables = Array.from(form.querySelectorAll('table'))
+      .map(table => Array.from(table.querySelectorAll('tr'))
+        .map(tr => Array.from(tr.querySelectorAll('th, td'))
+          .map(td => {
+            const select = td.querySelector('select')
+            if (select !== null) {
+              return select.value
+            }
+            return td.textContent
+          })))
+
+    const details = tables.map((table, index) => {
+      return {
+        detailName: buttons[index],
+        status: table
+      }
+    })
+
+    return { eventName: title, details: details }
+  })
+}
