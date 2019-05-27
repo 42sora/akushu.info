@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import firebase from 'firebase'
 import { firestore } from './firebaseConfig'
 import { aggregateEntry } from './utils/FortuneAggregator'
 import { compareDateStr } from './utils/DateStrComparer'
@@ -8,7 +9,21 @@ Vue.use(Vuex)
 
 let unsubscribe
 
-export default new Vuex.Store({
+const replacer = (key, value) => {
+  if (key === 'updatedAt') {
+    return value.toMillis()
+  }
+  return value
+}
+
+const reviver = (key, value) => {
+  if (key === 'updatedAt') {
+    return firebase.firestore.Timestamp.fromMillis(value)
+  }
+  return value
+}
+
+const store = new Vuex.Store({
   state: {
     auth: { uid: null },
     user: {
@@ -29,6 +44,14 @@ export default new Vuex.Store({
     }
   },
   mutations: {
+    loadCache (state) {
+      if (localStorage.getItem('store')) {
+        const cachedStore = JSON.parse(localStorage.getItem('store'), reviver)
+        console.debug(cachedStore)
+
+        this.replaceState(Object.assign(state, cachedStore))
+      }
+    },
     clear (state) {
       state.auth = { uid: null }
       state.user = {
@@ -49,6 +72,10 @@ export default new Vuex.Store({
     }
   },
   actions: {
+    loadCache ({ commit }) {
+      console.debug('loadCache')
+      commit('loadCache')
+    },
     signIn ({ commit }, auth) {
       commit('setAuth', auth)
       // 2重でsubscribeされるのを防ぐ
@@ -73,3 +100,11 @@ export default new Vuex.Store({
     }
   }
 })
+
+store.dispatch('loadCache')
+store.subscribe((mutation, state) => {
+  console.debug('saveCache')
+  localStorage.setItem('store', JSON.stringify(state, replacer))
+})
+
+export default store
