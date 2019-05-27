@@ -17,17 +17,6 @@ export default {
   data: function () {
     return { isLoading: true }
   },
-  created () {
-    const unsubscribe = this.$auth.onAuthStateChanged((auth) => {
-      if (auth != null) {
-        this.$store.dispatch('signIn', auth)
-        this.$router.push('/')
-      }
-    })
-    this.$once('hook:beforeDestroy', () => {
-      unsubscribe()
-    })
-  },
   mounted () {
     let ui = firebaseui.auth.AuthUI.getInstance()
     if (!ui) { ui = new firebaseui.auth.AuthUI(this.$auth) }
