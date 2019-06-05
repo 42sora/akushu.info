@@ -2,6 +2,7 @@ import Vue from 'vue'
 import Router from 'vue-router'
 import store from './store'
 import Home from './views/Home.vue'
+import SoldOut from './views/SoldOut.vue'
 import NotFound from './views/NotFound.vue'
 import SignIn from './views/SignIn.vue'
 
@@ -16,6 +17,10 @@ const router = new Router({
       name: 'home',
       meta: { requiresAuth: true },
       component: Home
+    }, {
+      path: '/soldout',
+      name: 'soldout',
+      component: SoldOut
     }, {
       path: '/signin',
       name: 'signin',
