@@ -39,7 +39,7 @@ export default {
     },
     events () {
       const sortKey = this.sortKey.goods.slice().sort((a, b) => a.priority - b.priority).reverse()
-      return sortKey.map(key => this.origin[key.groupName][key.goodsName])
+      return sortKey.map(key => this.origin[key.goodsName])
     }
   },
   methods: {
