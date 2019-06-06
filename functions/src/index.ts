@@ -16,13 +16,11 @@ const TOPIC_SCRAPING_FORTUNE = 'ScrapingFortune'
 const REGION = 'asia-northeast1'
 
 // puppeteer
-let browser: puppeteer.Browser
 const getNewPage = async () => {
-  if (!browser) {
-    browser = await puppeteer.launch({
-      args: ['--no-sandbox']
-    })
-  }
+  const browser = await puppeteer.launch({
+    args: ['--no-sandbox']
+  })
+
   const page = await browser.newPage()
   await page.setRequestInterception(true)
   page.on('request', async request => {
@@ -172,4 +170,41 @@ export const subFortune = functions
     } finally {
       await page.close()
     }
+  })
+
+export const scrapingGoodsList = functions
+  .region(REGION)
+  .runWith({
+    timeoutSeconds: 540,
+    memory: '1GB'
+  })
+  .https.onRequest(async (_, __) => {
+    const configDoc = await db.collection("config").doc("goods").get()
+    const access = configDoc.get("access")
+    console.log(access);
+
+    const promises: Promise<any>[] = []
+
+    for (const config of access) {
+      const page = await getNewPage()
+
+      const email = functions.config().fortune.email
+      const pass = functions.config().fortune.pass
+
+      const { isSuccess, errorMessage } = await fortune.login(page, email, pass)
+      console.log(isSuccess + ":" + errorMessage);
+      const url = await fortune.getGoodsPageUrl(page, config.url)
+      console.log(url);
+      if (url === null) {
+        return { message: "goods page not found", url }
+      }
+      const res = await fortune.getGoodsList(page, url)
+      console.log(JSON.stringify(res, undefined, 1))
+      promises.push(db.collection("public").doc("goodsList").update({
+        [config.goodsName]: admin.firestore.FieldValue.arrayUnion(res)
+      }))
+    }
+    
+    await Promise.all(promises)
+    return { message: "success", access }
   })

@@ -262,7 +262,8 @@ export const getGoodsList = async (page: Page, url: string) => {
               return select.value
             }
             return td.textContent
-          })))
+          })
+        ).map((tr, i) => { return { [i]: tr } })) //firestoreはネストした配列を扱えない
 
     const details = tables.map((table, index) => {
       return {
