@@ -1,7 +1,6 @@
 <template>
   <div class="home">
     <div class="container">
-      <main-nav />
       <div class="level">
         <div class="level-item container">
           <button
@@ -89,7 +88,6 @@
 
 <script>
 import { isPast } from '@/utils/DateStrComparer'
-import MainNav from '@/components/MainNav'
 import AkuTable from '@/components/AkuTable'
 import FortuneLoginForm from '@/components/FortuneLoginForm'
 import MemberFilter from '@/components/MemberFilter'
@@ -105,7 +103,7 @@ const getNowDateStr = () => {
 
 export default {
   name: 'Home',
-  components: { MainNav, AkuTable, FortuneLoginForm, MemberFilter, ScrapingProgress },
+  components: { AkuTable, FortuneLoginForm, MemberFilter, ScrapingProgress },
   data: function () {
     return {
       isFortuneLogin: false,

@@ -1,6 +1,5 @@
 <template>
   <div class="container">
-    <main-nav />
     <section
       v-for="event in events"
       :key="event[0].eventName"
@@ -25,11 +24,10 @@
   </div>
 </template>
 <script>
-import MainNav from '@/components/MainNav'
 import SoldOutTable from '@/components/SoldOutTable.vue'
 export default {
   name: 'SoldOut',
-  components: { MainNav, SoldOutTable },
+  components: { SoldOutTable },
   computed: {
     origin () {
       return this.$store.state.public.goodsList

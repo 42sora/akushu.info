@@ -23,7 +23,7 @@ export default {
     ui.start('#firebaseui-auth-container', {
       callbacks: {
         signInSuccessWithAuthResult: (authResult, redirectUrl) => {
-          this.$store.dispatch('signIn', { user: authResult.user })
+          this.$store.dispatch('signIn', authResult.user)
           this.$router.push('/')
           return false
         },
