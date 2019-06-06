@@ -34,6 +34,12 @@ const store = new Vuex.Store({
         applyList: []
       },
       scrapingState: {}
+    },
+    public: {
+      sortKey: {
+        goods: []
+      },
+      goodsList: {}
     }
   },
   getters: {
@@ -63,6 +69,10 @@ const store = new Vuex.Store({
     setAuth (state, payload) {
       console.debug('commit:setAuth')
       state.auth = payload
+    },
+    setPublic (state, payload) {
+      console.debug('commit:setPublic')
+      state.public = payload
     }
   },
   actions: {
@@ -101,6 +111,30 @@ if (localStorage.getItem('store')) {
 store.subscribe((mutation, state) => {
   console.debug('Cache:save')
   localStorage.setItem('store', JSON.stringify(state, replacer))
+})
+
+// subscribe public collection
+firestore.collection('public').onSnapshot(snapshot => {
+  const data = snapshot.docs.reduce((obj, doc) => {
+    obj[doc.id] = doc.data()
+    return obj
+  }, {})
+  // Firestore can not nest arrays
+  // convert objects of key is number to an array
+  if (data.hasOwnProperty('goodsList')) {
+    for (const events of Object.values(data.goodsList)) {
+      for (const event of events) {
+        for (const detail of event.details) {
+          const statusArray = []
+          for (const key of Object.keys(detail.status)) {
+            statusArray[key] = detail.status[key]
+          }
+          detail.status = statusArray
+        }
+      }
+    }
+  }
+  store.commit('setPublic', data)
 })
 
 export default store
