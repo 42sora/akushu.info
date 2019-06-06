@@ -39,7 +39,7 @@ router.beforeEach((to, from, next) => {
   if (requiresAuth) {
     // このルートはログインされているかどうか認証が必要です。
     // もしされていないならば、ログインページにリダイレクトします。
-    const signnedIn = store.state.auth.uid !== null
+    const signnedIn = store.getters.signnedIn
     if (signnedIn) {
       next()
     } else {

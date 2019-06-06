@@ -49,7 +49,8 @@ const store = new Vuex.Store({
 
       const eventList = aggregateEntry(entryList)
       return eventList.sort((a, b) => compareDateStr(a.eventDate, b.eventDate))
-    }
+    },
+    signnedIn: state => state.auth.uid !== null
   },
   mutations: {
     clear (state) {

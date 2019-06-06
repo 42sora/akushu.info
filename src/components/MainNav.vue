@@ -37,9 +37,19 @@
         <div class="navbar-item">
           <div class="buttons">
             <a
+              v-if="signnedIn"
               class="button is-light"
               @click="signOut"
-            >ログアウト</a>
+            >
+              ログアウト
+            </a>
+            <a
+              v-else
+              class="button is-primary is-light"
+              @click="signIn"
+            >
+              ログイン
+            </a>
           </div>
         </div>
       </div>
@@ -53,11 +63,18 @@ export default {
       menuIsActive: false
     }
   },
+  computed: {
+    signnedIn () {
+      return this.$store.getters.signnedIn
+    }
+  },
   methods: {
+    signIn () {
+      this.$router.push('/signin')
+    },
     async signOut () {
       await this.$auth.signOut()
       this.$store.dispatch('signOut')
-      this.$router.push('/signin')
     }
   }
 }
