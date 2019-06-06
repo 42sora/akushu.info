@@ -263,7 +263,13 @@ export const getGoodsList = async (page: Page, url: string) => {
             }
             return td.textContent
           })
-        ).map((tr, i) => { return { [i]: tr } })) //firestoreはネストした配列を扱えない
+        )
+      )//firestoreはネストした配列を扱えないので、keyがnumberのobjectに変換する
+      .map(table => {
+        const newTable: { [key: number]: (string | null)[] } = {}
+        table.forEach((tr, i) => newTable[i] = tr)
+        return newTable
+      })
 
     const details = tables.map((table, index) => {
       return {

@@ -178,7 +178,7 @@ export const scrapingGoodsList = functions
     timeoutSeconds: 540,
     memory: '1GB'
   })
-  .https.onRequest(async (_, __) => {
+  .https.onRequest(async (_, response) => {
     const configDoc = await db.collection("config").doc("goods").get()
     const access = configDoc.get("access")
     console.log(access);
@@ -196,7 +196,8 @@ export const scrapingGoodsList = functions
       const url = await fortune.getGoodsPageUrl(page, config.url)
       console.log(url);
       if (url === null) {
-        return { message: "goods page not found", url }
+        response.status(200).send({ message: "goods page not found", url })
+        return
       }
       const res = await fortune.getGoodsList(page, url)
       console.log(JSON.stringify(res, undefined, 1))
@@ -204,7 +205,7 @@ export const scrapingGoodsList = functions
         [config.goodsName]: admin.firestore.FieldValue.arrayUnion(res)
       }))
     }
-    
+
     await Promise.all(promises)
-    return { message: "success", access }
+    response.status(200).send({ message: "success", access })
   })
