@@ -26,15 +26,15 @@ export default {
   padding-bottom: 72px;
 }
 .bk-coler-nogi{
-  background-color: #ffb7ff;
+  background-color: #ffccff;
 }
 .bk-coler-keyaki{
-  background-color: #b7ffb7;
+  background-color: #ccffcc;
 }
 .bk-coler-yoshimoto{
-  background-color: #ffb7b7;
+  background-color: #ffcccc;
 }
 .bk-coler-hinata{
-  background-color: #b7ffff;
+  background-color: #ccffff;
 }
 </style>
