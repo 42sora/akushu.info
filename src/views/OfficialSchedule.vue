@@ -1,47 +1,40 @@
 <template>
-  <div class="container">
-    <div class="notification">
+  <div class="official-schedule container">
+    <div
+      v-for="schedule in schedules"
+      :key="schedule[0].date"
+      class="box"
+    >
+      <h2 class="subtitle has-text-weight-bold">
+        {{ schedule[0].date }}
+      </h2>
       <div
-        v-for="schedule in schedules"
-        :key="schedule[0].date"
+        v-for="(item, index) in schedule"
+        :key="item.goodsName"
       >
-        <div class="list">
-          <div
-            class="list-item"
-          >
-            <h2 class="subtitle has-text-weight-bold">
-              {{ schedule[0].date }}
-            </h2>
-            <div
-              v-for="(item, index) in schedule"
-              :key="item.goodsName"
-            >
-              <div
-                class="item"
-                :class="getGroupNameClass(item.groupName)"
-              >
-                {{ item.groupName }} {{ item.goodsNumber }}
-                <span class="is-hidden-mobile">「{{ item.goodsName }}」</span>
-              </div>
-              <div
-                class="item"
-                :style="getPlaceStyle(item.place)"
-              >
-                {{ item.place }}
-              </div>
-              <div
-                class="item"
-                :class="getEventTypeClass(item.eventType)"
-              >
-                {{ item.eventType }}
-              </div>
-              <div
-                v-if="index!==schedule.length-1"
-                class="separator"
-              />
-            </div>
-          </div>
+        <div
+          class="item"
+          :class="getGroupNameClass(item.groupName)"
+        >
+          {{ item.groupName }} {{ item.goodsNumber }}
+          <span class="is-hidden-mobile">「{{ item.goodsName }}」</span>
         </div>
+        <div
+          class="item"
+          :style="getPlaceStyle(item.place)"
+        >
+          {{ item.place }}
+        </div>
+        <div
+          class="item"
+          :class="getEventTypeClass(item.eventType)"
+        >
+          {{ item.eventType }}
+        </div>
+        <div
+          v-if="index!==schedule.length-1"
+          class="separator"
+        />
       </div>
     </div>
   </div>
@@ -120,10 +113,18 @@ export default {
 }
 </script>
 <style scoped>
+.official-schedule{
+  padding: 24px;
+  background-color: #fff9fc;
+}
+.box{
+  padding: 8px 12px;
+  margin-bottom: 12px;
+}
 .item{
   display: inline-block;
-  padding: 4px;
-  margin-left: 4px;
+  padding: 4px 8px;
+  margin-right: 4px;
   margin-bottom: 4px;
   border: solid #4a4a4a 1px;
   border-radius: 24px;
@@ -131,11 +132,9 @@ export default {
 .subtitle{
   margin-bottom: 8px;
 }
-.list-item{
-  margin-bottom: 12px;
-}
 .separator{
-  margin-bottom: 4px;
+  margin-top: 6px;
+  margin-bottom: 8px;
   border-bottom: solid lightgray 2px;
 }
 .zenkoku{
