@@ -1,7 +1,9 @@
 <template>
   <div id="app">
     <main-nav id="sticky-header" />
-    <router-view id="main-content" />
+    <transition name="fade">
+      <router-view id="main-content" />
+    </transition>
     <main-footer id="sticky-footer" />
   </div>
 </template>
@@ -25,9 +27,13 @@ export default {
 #main-content {
   padding-bottom: 72px;
 }
+.fade-enter-active {
+  transition: opacity 100ms;
 .bk-coler-nogi{
   background-color: #ffccff;
 }
+.fade-enter, .fade-leave-to {
+  opacity: 0;
 .bk-coler-keyaki{
   background-color: #ccffcc;
 }
