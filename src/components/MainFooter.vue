@@ -1,14 +1,14 @@
 <template>
-  <footer class="footer">
+  <footer class="main-footer footer">
     <div class="level is-mobile">
       <div
         class="level-item"
         @click="toSoldOut"
       >
-        <div class="icon is-large">
+        <div class="icon is-2x">
           <font-awesome-icon
             icon="table"
-            size="3x"
+            size="2x"
           />
         </div>
       </div>
@@ -16,10 +16,10 @@
         class="level-item"
         @click="toSchedule"
       >
-        <span class="icon is-large">
+        <span class="icon is-2x">
           <font-awesome-icon
             icon="calendar"
-            size="3x"
+            size="2x"
           />
         </span>
       </div>
@@ -27,10 +27,10 @@
         class="level-item"
         @click="toHome"
       >
-        <span class="icon is-large">
+        <span class="icon is-2x">
           <font-awesome-icon
             icon="user"
-            size="3x"
+            size="2x"
           />
         </span>
       </div>
@@ -58,7 +58,7 @@ export default {
 }
 </script>
 <style scoped>
-footer{
+.main-footer{
   width: 100vw;
   background-color: lavenderblush;
   padding: 12px 24px;
