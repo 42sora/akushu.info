@@ -29,18 +29,8 @@ export default {
 }
 .fade-enter-active {
   transition: opacity 100ms;
-.bk-coler-nogi{
-  background-color: #ffccff;
 }
 .fade-enter, .fade-leave-to {
   opacity: 0;
-.bk-coler-keyaki{
-  background-color: #ccffcc;
-}
-.bk-coler-yoshimoto{
-  background-color: #ffcccc;
-}
-.bk-coler-hinata{
-  background-color: #ccffff;
 }
 </style>

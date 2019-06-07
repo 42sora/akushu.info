@@ -1,6 +1,19 @@
 @import "../node_modules/bulma/bulma.sass";
 @import "../node_modules/firebaseui-ja/dist/firebaseui.css";
 
-$card-header-background-color:#FFE0EB;
+$card-header-background-color: #ffe0eb;
 
 @import "../node_modules/bulma/sass/components/card.sass";
+
+.bk-coler-nogi {
+  background-color: #ffccff;
+}
+.bk-coler-keyaki {
+  background-color: #ccffcc;
+}
+.bk-coler-yoshimoto {
+  background-color: #ffcccc;
+}
+.bk-coler-hinata {
+  background-color: #ccffff;
+}
