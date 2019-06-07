@@ -17,7 +17,7 @@
           <th />
           <th
             v-for="(place ,i) in placeHeader"
-            :key="place"
+            :key="i"
             :colspan="partHeader[i].length"
             class="title-cell"
           >
@@ -29,7 +29,7 @@
           <template v-for="parts in partHeader">
             <th
               v-for="part in parts"
-              :key="part"
+              :key="getKey(part)"
               class="has-text-centered"
             >
               {{ part }}
@@ -50,7 +50,7 @@
             <template v-if="getStatus(member,detail.detailName).length>0">
               <td
                 v-for="state in getStatus(member,detail.detailName)"
-                :key="state"
+                :key="getKey(state)"
                 class="has-text-centered"
                 :class="{
                   'has-background-warning':!getStatus(member,detail.detailName).includes('◯'),
@@ -63,7 +63,7 @@
             <template v-else>
               <td
                 v-for="dummy in getDummy(detail.detailName)"
-                :key="dummy"
+                :key="getKey(dummy)"
                 class="has-text-centered"
               >
                 {{ dummy }}
@@ -180,6 +180,9 @@ export default {
     }
   },
   methods: {
+    getKey (_) {
+      return Symbol('')
+    },
     getStatus (member, detailName) {
       return this.merged.details.find(detail => detail.detailName === detailName).status
         .filter(status => status[0] === member)
