@@ -3,6 +3,7 @@ import Router from 'vue-router'
 import store from './store'
 import Home from './views/Home.vue'
 import SoldOut from './views/SoldOut.vue'
+import OfficialSchedule from './views/OfficialSchedule.vue'
 import NotFound from './views/NotFound.vue'
 import SignIn from './views/SignIn.vue'
 
@@ -21,6 +22,10 @@ const router = new Router({
       path: '/soldout',
       name: 'soldout',
       component: SoldOut
+    }, {
+      path: '/schedule',
+      name: 'schedule',
+      component: OfficialSchedule
     }, {
       path: '/signin',
       name: 'signin',

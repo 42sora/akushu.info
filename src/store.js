@@ -39,7 +39,10 @@ const store = new Vuex.Store({
       sortKey: {
         goods: []
       },
-      goodsList: {}
+      goodsList: {},
+      officialSchedule: {
+        akushu: []
+      }
     }
   },
   getters: {

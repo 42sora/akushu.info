@@ -14,6 +14,17 @@
       </div>
       <div
         class="level-item"
+        @click="toSchedule"
+      >
+        <span class="icon is-large">
+          <font-awesome-icon
+            icon="calendar"
+            size="3x"
+          />
+        </span>
+      </div>
+      <div
+        class="level-item"
         @click="toHome"
       >
         <span class="icon is-large">
@@ -36,6 +47,9 @@ export default {
   methods: {
     toSoldOut () {
       this.$router.push('/soldout')
+    },
+    toSchedule () {
+      this.$router.push('/schedule')
     },
     toHome () {
       this.$router.push('/')
