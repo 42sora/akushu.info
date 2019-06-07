@@ -127,7 +127,7 @@ export default {
   margin-right: 4px;
   margin-bottom: 4px;
   border: solid #4a4a4a 1px;
-  border-radius: 24px;
+  border-radius: 16px;
 }
 .subtitle{
   margin-bottom: 8px;
