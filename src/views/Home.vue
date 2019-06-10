@@ -64,23 +64,33 @@
         v-if="pastEvents.length>0"
         class="top-margin"
       >
-        <h2 class="subtitle">
-          過去のイベント
-        </h2>
-      </div>
-      <div
-        v-for="event in pastEvents"
-        :key="event.eventDate"
-        class="card"
-      >
-        <header class="card-header">
-          <p class="card-header-title">
-            {{ event.eventDate }} {{ event.eventPlace }}
-          </p>
-        </header>
-        <div class="card-content">
-          <aku-table :tickets="event.tickets" />
+        <div @click="togglePastEvents">
+          <h2
+            class="subtitle"
+            style="display:inline"
+          >
+            過去のイベント
+          </h2>
+          <span class="icon">
+            <font-awesome-icon icon="angle-down" />
+          </span>
         </div>
+        <template v-if="displayPastEvents">
+          <div
+            v-for="event in pastEvents"
+            :key="event.eventDate"
+            class="card"
+          >
+            <header class="card-header">
+              <p class="card-header-title">
+                {{ event.eventDate }} {{ event.eventPlace }}
+              </p>
+            </header>
+            <div class="card-content">
+              <aku-table :tickets="event.tickets" />
+            </div>
+          </div>
+        </template>
       </div>
     </div>
   </div>
@@ -107,7 +117,8 @@ export default {
   data: function () {
     return {
       isFortuneLogin: false,
-      filter: []
+      filter: [],
+      displayPastEvents: false
     }
   },
   computed: {
@@ -158,6 +169,9 @@ export default {
     hideFortuneLoginForm () {
       this.isFortuneLogin = false
     },
+    togglePastEvents () {
+      this.displayPastEvents = !this.displayPastEvents
+    },
     async startScrapping (event) {
       const startScraping = this.$functions.httpsCallable('startScraping')
       const res = await startScraping({ email: event.email, password: event.password })
@@ -168,8 +182,8 @@ export default {
   }
 }
 </script>
-<style>
+<style scoped>
 .top-margin{
-  margin: 24px auto auto auto;
+  margin-top: 24px;
 }
 </style>
