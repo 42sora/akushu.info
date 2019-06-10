@@ -103,6 +103,7 @@ const placeColors = [
 const getNowYear = () => new Date().getFullYear()
 const getNowMonth = () => new Date().getMonth() + 1
 const getNowDay = () => new Date().getDate()
+const sortSameAsMaster = master => (a, b) => master.indexOf(a) - master.indexOf(b)
 export default {
   name: 'OfficialSchedule',
   data: function () {
@@ -164,13 +165,13 @@ export default {
       }
     },
     filteredGroups () {
-      return this.displayFilter ? this.allGroups : this.groupFilter
+      return this.displayFilter ? this.allGroups : this.groupFilter.slice().sort(sortSameAsMaster(this.allGroups))
     },
     filteredPrefectures () {
-      return this.displayFilter ? this.prefectures : this.prefectureFilter
+      return this.displayFilter ? this.prefectures : this.prefectureFilter.slice().sort(sortSameAsMaster(this.prefectures))
     },
     filteredEventTypes () {
-      return this.displayFilter ? this.eventTypes : this.eventTypeFilter
+      return this.displayFilter ? this.eventTypes : this.eventTypeFilter.slice().sort(sortSameAsMaster(this.eventTypes))
     }
   },
   methods: {
@@ -213,7 +214,7 @@ export default {
       }
     },
     getPlaceStyle (place) {
-      const placeIndex = this.allPlace.findIndex(x => x === place)
+      const placeIndex = this.allPlace.indexOf(place)
       const color = placeColors[placeIndex % placeColors.length]
       return {
         'background-color': color
