@@ -46,20 +46,11 @@
         :members="members"
         @chengedFilter="filter=$event"
       />
-      <div
+      <aku-card
         v-for="event in futureEvtnts"
         :key="event.eventDate"
-        class="card"
-      >
-        <header class="card-header">
-          <p class="card-header-title">
-            {{ event.eventDate }} {{ event.eventPlace }}
-          </p>
-        </header>
-        <div class="card-content">
-          <aku-table :tickets="event.tickets" />
-        </div>
-      </div>
+        :event="event"
+      />
       <div
         v-if="pastEvents.length>0"
         class="top-margin"
@@ -76,29 +67,19 @@
           </span>
         </div>
         <template v-if="displayPastEvents">
-          <div
+          <aku-card
             v-for="event in pastEvents"
             :key="event.eventDate"
-            class="card"
-          >
-            <header class="card-header">
-              <p class="card-header-title">
-                {{ event.eventDate }} {{ event.eventPlace }}
-              </p>
-            </header>
-            <div class="card-content">
-              <aku-table :tickets="event.tickets" />
-            </div>
-          </div>
+            :event="event"
+          />
         </template>
       </div>
     </div>
   </div>
 </template>
-
 <script>
 import { isPast } from '@/utils/DateStrComparer'
-import AkuTable from '@/components/AkuTable'
+import AkuCard from '@/components/AkuCard'
 import FortuneLoginForm from '@/components/FortuneLoginForm'
 import MemberFilter from '@/components/MemberFilter'
 import ScrapingProgress from '@/components/ScrapingProgress'
@@ -113,7 +94,7 @@ const getNowDateStr = () => {
 
 export default {
   name: 'Home',
-  components: { AkuTable, FortuneLoginForm, MemberFilter, ScrapingProgress },
+  components: { AkuCard, FortuneLoginForm, MemberFilter, ScrapingProgress },
   data: function () {
     return {
       isFortuneLogin: false,
