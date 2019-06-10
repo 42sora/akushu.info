@@ -6,7 +6,7 @@
       class="box"
     >
       <h2 class="subtitle has-text-weight-bold">
-        {{ schedule[0].date }}
+        {{ toDisplayDate(schedule[0].date) }}
       </h2>
       <div
         v-for="(item, index) in schedule"
@@ -50,23 +50,25 @@ const placeColors = [
   '#ffffcc',
   '#ffe5cc'
 ]
+const getNowYear = () => new Date().getFullYear()
 const getNowMonth = () => new Date().getMonth() + 1
+const getNowDay = () => new Date().getDate()
 export default {
   name: 'OfficialSchedule',
   computed: {
     sorted () {
       const toInt = str => parseInt(str.replace(/[^0-9^.]/g, ''), 10)
-      const getMonth = date => {
-        const splited = date.split('月')
-        return toInt(splited[0])
-      }
-      const getDay = date => {
-        const splited = date.split('月')
-        return toInt(splited[1])
-      }
-      const compare = (a, b) => getMonth(a.date) - getMonth(b.date) || getDay(a.date) - getDay(b.date)
+      const getYear = date => toInt(date.split('年')[0])
+      const getMonth = date => toInt(date.split('年')[1].split('月')[0])
+      const getDay = date => toInt(date.split('月')[1])
+      const isFuture = date =>
+        getYear(date) > getNowYear() ||
+       (getYear(date) === getNowYear() && getMonth(date) > getNowMonth()) ||
+       (getYear(date) === getNowYear() && getMonth(date) === getNowMonth() && getDay(date) >= getNowDay())
+      const compare = (a, b) => getYear(a.date) - getYear(b.date) || getMonth(a.date) - getMonth(b.date) || getDay(a.date) - getDay(b.date)
+
       return this.$store.state.public.officialSchedule.akushu.slice()
-        .filter(schedule => getMonth(schedule.date) >= getNowMonth())
+        .filter(schedule => isFuture(schedule.date))
         .sort(compare)
     },
     schedules () {
@@ -88,6 +90,9 @@ export default {
     }
   },
   methods: {
+    toDisplayDate (date) {
+      return date.split('年')[1]
+    },
     getGroupNameClass (groupName) {
       return {
         'bk-coler-nogi': groupName.includes('乃木坂'),
