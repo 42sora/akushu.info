@@ -75,46 +75,48 @@
         </span>
       </button>
     </div>
-    <div
-      v-for="schedule in schedules"
-      :key="schedule[0].date"
-      class="box"
-    >
-      <h2 class="subtitle has-text-weight-bold">
-        {{ toDisplayDate(schedule[0].date) }}
-      </h2>
+    <transition-group name="scale-down">
       <div
-        v-for="(item, index) in schedule"
-        :key="item.goodsName"
+        v-for="schedule in schedules"
+        :key="schedule[0].date"
+        class="box"
       >
+        <h2 class="subtitle has-text-weight-bold">
+          {{ toDisplayDate(schedule[0].date) }}
+        </h2>
         <div
-          class="item"
-          :class="getGroupNameClass(item.groupName)"
-          @click="toggleGroupFilter(item.groupName)"
+          v-for="(item, index) in schedule"
+          :key="item.goodsName"
         >
-          {{ item.groupName }} {{ item.goodsNumber }}
-          <span class="is-hidden-mobile">「{{ item.goodsName }}」</span>
+          <div
+            class="item"
+            :class="getGroupNameClass(item.groupName)"
+            @click="toggleGroupFilter(item.groupName)"
+          >
+            {{ item.groupName }} {{ item.goodsNumber }}
+            <span class="is-hidden-mobile">「{{ item.goodsName }}」</span>
+          </div>
+          <div
+            class="item"
+            :style="getPlaceStyle(item.place)"
+            @click="togglePrefectureFilter(item.place.split(':')[0])"
+          >
+            {{ item.place }}
+          </div>
+          <div
+            class="item"
+            :class="getEventTypeClass(item.eventType)"
+            @click="toggleEventTypeFilter(item.eventType)"
+          >
+            {{ item.eventType }}
+          </div>
+          <div
+            v-if="index!==schedule.length-1"
+            class="separator"
+          />
         </div>
-        <div
-          class="item"
-          :style="getPlaceStyle(item.place)"
-          @click="togglePrefectureFilter(item.place.split(':')[0])"
-        >
-          {{ item.place }}
-        </div>
-        <div
-          class="item"
-          :class="getEventTypeClass(item.eventType)"
-          @click="toggleEventTypeFilter(item.eventType)"
-        >
-          {{ item.eventType }}
-        </div>
-        <div
-          v-if="index!==schedule.length-1"
-          class="separator"
-        />
       </div>
-    </div>
+    </transition-group>
   </div>
 </template>
 <script>
@@ -333,5 +335,19 @@ export default {
 }
 .kobetsu{
   background-color: #ffff7f;
+}
+.scale-down-enter-active {
+  transform: scaleY(1);
+  max-height: 163px;
+  transition: all 200ms ease-in;
+}
+.scale-down-leave-active {
+  transform: scaleY(1);
+  max-height: 163px;
+  transition: all 200ms ease-out;
+}
+.scale-down-enter, .scale-down-leave-to {
+  transform: scaleY(0);
+  max-height: 0;
 }
 </style>
