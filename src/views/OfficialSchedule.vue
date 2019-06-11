@@ -26,6 +26,17 @@
         </button>
       </div>
       <div :class="{'inline':filterBoxState==='minimum'}">
+        <template v-if="filterBoxState==='full'">
+          <button
+            v-for="(group, name) in prefectureGroup"
+            :key="name"
+            class="button item"
+            :style="getPrefectureGroupStyle(group)"
+            @click="tapPrefectureGroup(group)"
+          >
+            {{ name }}
+          </button>
+        </template>
         <button
           v-for="prefecture in filteredPrefectures"
           :key="prefecture"
@@ -127,6 +138,7 @@ export default {
     return {
       displayFilter: false,
       allGroups: [ '乃木坂46', '欅坂46', '日向坂46', '吉本坂46' ],
+      prefectureGroup: { '関東': ['千葉', '東京', '神奈川'], '関西': ['京都', '大阪'] },
       prefectures: ['宮城', '千葉', '東京', '神奈川', '愛知', '京都', '大阪'],
       eventTypes: ['個別握手会', '全国握手会'],
       groupFilter: [],
@@ -205,6 +217,13 @@ export default {
         this.groupFilter.push(group)
       }
     },
+    tapPrefectureGroup (prefectureGroup) {
+      if (prefectureGroup.every(g => this.prefectureFilter.includes(g))) {
+        this.prefectureFilter = this.prefectureFilter.filter(x => !prefectureGroup.includes(x))
+      } else {
+        this.prefectureFilter.push(...prefectureGroup)
+      }
+    },
     togglePrefectureFilter (prefecture) {
       if (this.prefectureFilter.some(x => x === prefecture)) {
         this.prefectureFilter = this.prefectureFilter.filter(x => x !== prefecture)
@@ -260,10 +279,17 @@ export default {
     getPrefectureFilterStyle (prefecture) {
       if (this.prefectureFilter.includes(prefecture)) {
         const findPlace = this.allPlace.find(place => place.includes(prefecture))
-        if (findPlace == null) {
+        if (findPlace === undefined) {
           return { 'background-color': '#e0e0e0' }
         }
         return this.getPlaceStyle(findPlace)
+      } else {
+        return {}
+      }
+    },
+    getPrefectureGroupStyle (prefectureGroup) {
+      if (prefectureGroup.every(g => this.prefectureFilter.includes(g))) {
+        return { 'background-color': '#ff7fbf' }
       } else {
         return {}
       }
