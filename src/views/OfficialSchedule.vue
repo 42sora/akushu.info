@@ -5,6 +5,7 @@
       :class="filterBoxClass"
     >
       <button
+        v-if="filterBoxState==='close'"
         class="button is-white is-fullwidth"
         @click="displayFilter=!displayFilter"
       >
@@ -13,7 +14,7 @@
           <font-awesome-icon icon="angle-down" />
         </span>
       </button>
-      <div>
+      <div :class="{'inline':filterBoxState==='minimum'}">
         <button
           v-for="group in filteredGroups"
           :key="group"
@@ -24,7 +25,7 @@
           {{ group }}
         </button>
       </div>
-      <div>
+      <div :class="{'inline':filterBoxState==='minimum'}">
         <button
           v-for="prefecture in filteredPrefectures"
           :key="prefecture"
@@ -35,7 +36,7 @@
           {{ prefecture }}
         </button>
       </div>
-      <div>
+      <div :class="{'inline':filterBoxState==='minimum'}">
         <button
           v-for="eventType in filteredEventTypes"
           :key="eventType"
@@ -46,6 +47,22 @@
           {{ eventType }}
         </button>
       </div>
+      <button
+        v-if="filterBoxState!=='close'"
+        class="button is-white is-fullwidth"
+        @click="displayFilter=!displayFilter"
+      >
+        <span class="icon">
+          <font-awesome-icon
+            v-if="filterBoxState==='full'"
+            icon="angle-double-up"
+          />
+          <font-awesome-icon
+            v-if="filterBoxState==='minimum'"
+            icon="angle-down"
+          />
+        </span>
+      </button>
     </div>
     <div
       v-for="schedule in schedules"
@@ -156,14 +173,6 @@ export default {
       return this.sorted.map(schedule => schedule.place)
         .filter((x, i, self) => self.indexOf(x) === i)
     },
-    filterBoxClass () {
-      return {
-        sticky: this.displayFilter ||
-          this.groupFilter.length > 0 ||
-          this.prefectureFilter.length > 0 ||
-          this.eventTypeFilter.length > 0
-      }
-    },
     filteredGroups () {
       return this.displayFilter ? this.allGroups : this.groupFilter.slice().sort(sortSameAsMaster(this.allGroups))
     },
@@ -172,6 +181,20 @@ export default {
     },
     filteredEventTypes () {
       return this.displayFilter ? this.eventTypes : this.eventTypeFilter.slice().sort(sortSameAsMaster(this.eventTypes))
+    },
+    filterBoxState () {
+      if (this.displayFilter) {
+        return 'full'
+      } else if (this.groupFilter.length > 0 || this.prefectureFilter.length > 0 || this.eventTypeFilter.length > 0) {
+        return 'minimum'
+      } else {
+        return 'close'
+      }
+    },
+    filterBoxClass () {
+      return {
+        sticky: this.filterBoxState !== 'close'
+      }
     }
   },
   methods: {
@@ -263,6 +286,9 @@ export default {
   margin-bottom: 4px;
   border: solid #4a4a4a 1px;
   border-radius: 16px;
+}
+.inline{
+  display: inline;
 }
 .sticky{
   position: sticky;
