@@ -251,7 +251,6 @@ export default {
 <style scoped>
 .official-schedule{
   padding: 24px;
-  background-color: #fff9fc;
 }
 .box{
   padding: 8px 12px;
