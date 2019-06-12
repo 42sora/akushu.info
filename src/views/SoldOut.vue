@@ -1,23 +1,23 @@
 <template>
   <div class="container">
     <section
-      v-for="event in events"
-      :key="event[0].eventName"
+      v-for="soldOut in soldOutList"
+      :key="soldOut.goodsName"
       class="section"
     >
       <div class="container">
         <div
           class="box"
-          :class="getTitleClass(event[0].eventName)"
+          :class="getTitleClass(soldOut.goodsName)"
         >
           <h2
             class="subtitle"
           >
-            {{ getTitle(event[0].eventName) }}
+            {{ getTitle(soldOut.goodsName) }}
           </h2>
         </div>
         <div class="sold-out-table">
-          <sold-out-table :event="event" />
+          <sold-out-table :events="soldOut.events" />
         </div>
       </div>
     </section>
@@ -29,15 +29,8 @@ export default {
   name: 'SoldOut',
   components: { SoldOutTable },
   computed: {
-    origin () {
-      return this.$store.state.public.goodsList
-    },
-    sortKey () {
-      return this.$store.state.public.sortKey
-    },
-    events () {
-      const sortKey = this.sortKey.goods.slice().sort((a, b) => a.priority - b.priority).reverse()
-      return sortKey.map(key => this.origin[key.goodsName])
+    soldOutList () {
+      return this.$store.getters.soldOutList
     }
   },
   methods: {

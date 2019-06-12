@@ -1,74 +1,60 @@
 <template>
   <div class="soldOutTable">
-    <table class="table is-bordered is-size-7 padding-zero">
+    <table>
       <thead>
         <tr>
-          <th rowspan="3" />
-          <th />
+          <th colspan="2" />
           <th
-            v-for="(date ,i) in dateHeader"
-            :key="date"
-            :colspan="partHeader[i].length"
+            v-for="header in eventHeader"
+            :key="header.date"
+            :colspan="header.parts.length"
           >
-            {{ date }}
+            {{ header.date }}
           </th>
         </tr>
         <tr>
-          <th />
+          <th colspan="2" />
           <th
-            v-for="(place ,i) in placeHeader"
-            :key="i"
-            :colspan="partHeader[i].length"
-            class="title-cell"
+            v-for="header in eventHeader"
+            :key="header.date"
+            :colspan="header.parts.length"
           >
-            {{ place }}
+            {{ header.place }}
           </th>
         </tr>
+      </thead>
+      <tbody class="is-size-7">
         <tr>
+          <th />
           <th>合計</th>
-          <template v-for="parts in partHeader">
+          <template v-for="header in eventHeader">
             <th
-              v-for="part in parts"
-              :key="getKey(part)"
-              class="has-text-centered"
+              v-for="(part,i) in header.parts"
+              :key="header.date + part"
+              :class="{'part-end':i+1===header.parts.length}"
             >
-              {{ part }}
+              {{ dPart(part) }}
             </th>
           </template>
         </tr>
-      </thead>
-      <tbody>
         <tr
-          v-for="member in members"
-          :key="member"
+          v-for="body in memberBody"
+          :key="body.name"
         >
-          <th class="title-cell">
-            {{ normalizeMemberName(member) }}
+          <th>
+            <div class="member-name">
+              {{ dName(body.name) }}
+            </div>
           </th>
-          <td>{{ getDisplayTotal(member) }}</td>
-          <template v-for="detail in merged.details">
-            <template v-if="getStatus(member,detail.detailName).length>0">
-              <td
-                v-for="state in getStatus(member,detail.detailName)"
-                :key="getKey(state)"
-                class="has-text-centered"
-                :class="{
-                  'has-background-warning':!getStatus(member,detail.detailName).includes('◯'),
-                  'has-text-danger':state===lastCompleted
-                }"
-              >
-                {{ state }}
-              </td>
-            </template>
-            <template v-else>
-              <td
-                v-for="dummy in getDummy(detail.detailName)"
-                :key="getKey(dummy)"
-                class="has-text-centered"
-              >
-                {{ dummy }}
-              </td>
-            </template>
+          <td>{{ dTotal(body.soldOut,body.total) }}</td>
+          <template v-for="(status,i) in body.status">
+            <td
+              v-for="(state,j) in status"
+              :key="i*1000+j"
+              :class="{'part-end':j+1===status.length}"
+            >
+              {{ dState(state) }}
+            </td>
           </template>
         </tr>
       </tbody>
@@ -76,6 +62,17 @@
   </div>
 </template>
 <script>
+const displayPartMap = {
+  '１部': 1,
+  '２部': 2,
+  '３部': 3,
+  '４部': 4,
+  '５部': 5,
+  '６部': 6,
+  '７部': 7,
+  '８部': 8,
+  '９部': 9
+}
 const displayNumberMap = {
   1: '❶',
   2: '❷',
@@ -99,151 +96,111 @@ const displayNumberMap = {
   20: '⓴'
 }
 const padding = num => num.toString().padStart(2, '0')
-const eventNameToInt = eventName => parseInt(/第([0-9]+)次/.exec(eventName)[1], 10)
 export default {
   props: {
-    event: { type: Array, required: true }
+    events: { type: Array, required: true }
   },
   computed: {
-    sorted () {
-      const compare = (a, b) => eventNameToInt(a.eventName) - eventNameToInt(b.eventName)
-      return this.event.slice().sort(compare).reverse()
-    },
-    merged () {
-      return this.sorted.slice()
-        .reduce((preEvent, curEvent) => {
-          const resultDetails = preEvent.details.slice()
-          for (const curDetail of curEvent.details) {
-            if (resultDetails.every(r => r.detailName !== curDetail.detailName)) {
-              resultDetails.unshift(curDetail)
-            }
+    eventHeader () {
+      return this.events
+        .map(event => {
+          return {
+            date: /[0-9]+月[0-9]+日/.exec(event.eventDetail)[0],
+            place: event.eventDetail.split('・').pop(),
+            parts: event.tickets.map(ticket => ticket.partName).filter((x, i, self) => self.indexOf(x) === i)
           }
-          const resultEvent = Object.assign({}, preEvent)
-          resultEvent.details = resultDetails
-          return resultEvent
         })
     },
-    dateHeader () {
-      return this.merged.details.map(detail => detail.detailName)
-        .map(name => /[0-9]+月[0-9]+日/.exec(name)[0])
-    },
-    placeHeader () {
-      return this.merged.details.map(detail => detail.detailName)
-        .map(name => name.split('・').pop())
-    },
-    partHeader () {
-      return this.merged.details.map(detail =>
-        detail.status[0].filter(name => name !== '')
-          .map(name => {
-            if (name.includes('１部')) {
-              return 1
-            } else if (name.includes('２部')) {
-              return 2
-            } else if (name.includes('３部')) {
-              return 3
-            } else if (name.includes('４部')) {
-              return 4
-            } else if (name.includes('５部')) {
-              return 5
-            } else if (name.includes('６部')) {
-              return 6
-            } else if (name.includes('７部')) {
-              return 7
-            } else if (name.includes('８部')) {
-              return 8
-            } else if (name.includes('９部')) {
-              return 9
-            } else {
-              return name
-            }
-          })
-      )
-    },
-    members () {
-      const compare = (a, b) => {
-        const aTotal = this.getTotal(a)
-        const bTotal = this.getTotal(b)
-        return bTotal.soldOut - aTotal.soldOut || bTotal.number - aTotal.number
-      }
-      return this.sorted.flatMap(event => event.details)
-        .flatMap(detail => detail.status)
-        .map(status => status[0])
-        .filter(name => name !== '')
+    memberBody () {
+      return this.events.flatMap(event => event.tickets)
+        .map(ticket => ticket.memberName)
         .filter((x, i, self) => self.indexOf(x) === i)
-        .sort(compare)
-    },
-    lastCompleted () {
-      if (this.sorted.length > 1) {
-        return displayNumberMap[eventNameToInt(this.sorted[1].eventName)]
-      }
-      return ''
+        .map(member => {
+          const status = this.events
+            .map(event =>
+              event.tickets
+                .filter(ticket => ticket.memberName === member)
+                .map(ticket => ticket.state))
+            .map((status, index) => status.length === 0 ? this.getAllNone(index) : status)
+          return {
+            name: member,
+            soldOut: status.flat().reduce((total, state) => typeof state === 'number' ? ++total : total, 0),
+            total: status.flat().reduce((total, state) => state !== '-' ? ++total : total, 0),
+            status: status
+          }
+        })
     }
   },
   methods: {
-    getKey (_) {
-      return Symbol('')
+    getAllNone (index) {
+      return this.eventHeader[index].parts.map(_ => '-')
     },
-    getStatus (member, detailName) {
-      return this.merged.details.find(detail => detail.detailName === detailName).status
-        .filter(status => status[0] === member)
-        .flatMap(state => state.slice(1))
-        .map((state, i) => {
-          if (state.includes('0')) {
-            return '◯'
-          } else if (state.includes('SOLD OUT')) {
-            const eventName = this.sorted.find(event =>
-              event.details.some(detail =>
-                detail.detailName === detailName &&
-                detail.status.some(status =>
-                  status[0] === member && !status[i + 1].includes('SOLD OUT')))).eventName
-            return displayNumberMap[eventNameToInt(eventName)]
-          } else if (state.includes('---')) {
-            return '―'
-          } else {
-            return state
-          }
-        })
+    dPart (part) {
+      for (const [k, v] of Object.entries(displayPartMap)) {
+        if (part.includes(k)) {
+          return v
+        }
+      }
+      return part
     },
-    getDummy (detailName) {
-      const detailIndex = this.merged.details.findIndex(detail => detail.detailName === detailName)
-      return this.partHeader[detailIndex].map(_ => '―')
+    dTotal (soldOut, total) {
+      return padding(soldOut) + '/' + padding(total)
     },
-    getTotal (member) {
-      return this.merged.details.flatMap(detail => detail.status)
-        .filter(status => status[0] === member)
-        .flatMap(status => status.slice(1))
-        .reduce((total, state) => {
-          if (state.includes('0')) {
-            total.number++
-          } else if (state.includes('SOLD OUT')) {
-            total.soldOut++
-            total.number++
-          }
-          return total
-        }, { soldOut: 0, number: 0 })
+    dName (name) {
+      return name.replace(/\s+/g, '')
     },
-    getDisplayTotal (member) {
-      const total = this.getTotal(member)
-      return padding(total.soldOut) + '/' + padding(total.number)
-    },
-    normalizeMemberName (memberName) {
-      return memberName.replace(/\s+/g, '')
+    dState (state) {
+      if (state === '-') {
+        return '―'
+      } else if (state === '*') {
+        return '◯'
+      } else {
+        return displayNumberMap[state]
+      }
     }
   }
 }
 </script>
 <style scoped>
-tbody th {
-  position: sticky;
+table {
+  border-collapse: separate;
+  border-width: 0;
+}
+table th, td {
+  border-style: solid;
+  border-color: lightgray;
+}
+thead th {
+  padding: 8px 0;
+  border-width: 2px 2px 0 0;
+}
+thead th:first-child {
+  border-width: 2px 2px 0 2px;
+}
+thead th:nth-child(n+2):nth-last-child(n+2) {
+  border-right-color: #a0a0a0
+}
+tbody th, td {
+  text-align: center;
+  vertical-align: middle;
+  padding: 2px 0;
+  border-width: 0 2px 1px 0;
+}
+tbody tr:first-child th {
+  border-width: 2px 2px 1px 0;
+}
+tbody tr:first-child th:first-child {
+  border-width: 2px 2px 1px 2px;
+}
+tbody th:first-child{
+  min-width: 64px;
+  border-width: 0 2px 1px 2px;
   background: white;
+  position: sticky;
   left: 0;
   z-index: 1;
 }
-.padding-zero td,
-.padding-zero th{
-  padding: 0px;
-}
-.title-cell{
-  min-width: 64px;
+.part-end:not(:last-child) {
+  border-right-color: #a0a0a0
 }
 </style>

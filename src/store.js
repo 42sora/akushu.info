@@ -40,12 +40,14 @@ const store = new Vuex.Store({
         goods: []
       },
       goodsList: {},
+      soldOutList: {},
       officialSchedule: {
         akushu: []
       }
     }
   },
   getters: {
+    signnedIn: state => state.auth.uid !== null,
     myEventList: state => {
       const entryList = state.user.fortune.entryList
       if (!entryList) return []
@@ -53,7 +55,10 @@ const store = new Vuex.Store({
       const eventList = aggregateEntry(entryList)
       return eventList.sort((a, b) => compareDateStr(a.eventDate, b.eventDate))
     },
-    signnedIn: state => state.auth.uid !== null
+    soldOutList: state => state.public.sortKey.goods.slice()
+      .sort((a, b) => a.priority - b.priority)
+      .reverse()
+      .map(key => state.public.soldOutList[key.goodsName])
   },
   mutations: {
     clear (state) {
