@@ -1,19 +1,107 @@
-import { goodsList } from './TestData'
+import { GoodsList, goodsList } from './TestData'
 
-for (const detail of goodsList.details) {
-  const status = detail.status
-  const part = status[0].slice(1)
-  const body = status.slice(1)
+type State = '-' | '*' | number
 
-  const result: any = {}
-  for (const row of body) {
-    result[row[0]] = {}
-    for (const [i, v] of row.slice(1).entries()) {
-      result[row[0]][part[i]] = v
-    }
-  }
-  console.log(result);
-  console.log(JSON.stringify(result, undefined, 1));
-
+interface SoldOutList {
+  goodsName: string
+  events: Event[]
 }
 
+interface Event {
+  eventDetail: string,
+  tickets: Ticket[]
+}
+
+interface Ticket {
+  memberName: string,
+  partName: string,
+  state: State
+}
+
+const eventNameToNumber = (eventName: string) => {
+  const parsed = /第([0-9]+)次/.exec(eventName)
+  if (parsed === null) {
+    return -1
+  }
+  return parseInt(parsed[1], 10)
+}
+
+
+const desc = goodsList.reverse()
+
+const findNumber = (detailName: string, memberName: string, partName: string) => {
+  for (const event of desc) {
+    const detail = event.details.find(d => d.detailName === detailName)
+    if (detail === undefined) {
+      continue
+    }
+
+    const status = detail.status.find(s => s[0] === memberName)
+    if (status === undefined) {
+      continue
+    }
+
+    const partIndex = detail.status[0].indexOf(partName)
+
+    const state = status[partIndex]
+    if (state === undefined) {
+      continue
+    }
+
+    if (state.includes('0')) {
+      return eventNameToNumber(event.eventName)
+    }
+
+  }
+
+  return -1
+}
+
+const getToState = (detailName: string, memberName: string, partName: string) =>
+  (currentState: string): State => {
+    if (currentState.includes('0')) {
+      return '*'
+    } else if (currentState.includes('---')) {
+      return '-'
+    } else if (currentState.includes("SOLD OUT")) {
+      return findNumber(detailName, memberName, partName)
+    } else {
+      return -1
+    }
+  }
+
+const base: GoodsList = {
+  eventName: desc[0].eventName,
+  details: []
+}
+
+for (const goods of desc) {
+  for (const detail of goods.details) {
+    if (!base.details.some(baseDetail => baseDetail.detailName === detail.detailName)) {
+      base.details.push(detail)
+    }
+  }
+}
+
+const reslut: SoldOutList = {
+  goodsName: base.eventName,
+  events: base.details.map(detail => {
+    return {
+      eventDetail: detail.detailName,
+      tickets: detail.status.slice(1).map(status => {
+        const parts = detail.status[0].slice(1)
+        const member = status[0]
+        return parts.map((part, i) => {
+          const toState = getToState(detail.detailName, member, part)
+          return {
+            memberName: member,
+            partName: part,
+            state: toState(status[i + 1])
+          }
+        })
+      }).reduce((pre, cur) => pre.concat(cur))
+    }
+  })
+}
+
+console.log(JSON.stringify(reslut, undefined, 1));
