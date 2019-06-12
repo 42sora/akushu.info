@@ -2,6 +2,7 @@ import * as functions from 'firebase-functions'
 import * as admin from 'firebase-admin'
 import * as puppeteer from 'puppeteer'
 import * as fortune from './scraping/fortune'
+import { firestoreToGoodsList, aggregateSoldOut } from './aggregator/aggregateSoldOut'
 
 // firestore
 admin.initializeApp(functions.config().firebase)
@@ -209,3 +210,30 @@ export const scrapingGoodsList = functions
     await Promise.all(promises)
     response.status(200).send({ message: "success", access })
   })
+
+export const aggregateGoodsList = functions
+  .region(REGION)
+  .runWith({
+    memory: '128MB'
+  })
+  .https.onRequest(async (_, response) => {
+    const publicCollection = db.collection("public")
+    const data = (await publicCollection.doc("goodsList").get()).data()
+    if (data === undefined) {
+      response.status(200).send({ message: "aggregate failed" })
+      return
+    }
+    const goodsList = firestoreToGoodsList(data)
+
+    const promises: Promise<any>[] = []
+    for (const key of Object.keys(goodsList)) {
+      const soldout = aggregateSoldOut(goodsList[key])
+
+      promises.push(publicCollection.doc("soldOutList").update({
+        [key]: soldout
+      }))
+    }
+    await Promise.all(promises)
+    response.status(200).send({ message: "success", keys: Object.keys(goodsList) })
+  })
+
