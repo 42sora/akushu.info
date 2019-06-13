@@ -8,6 +8,8 @@
             v-for="header in eventHeader"
             :key="header.date"
             :colspan="header.parts.length"
+            :class="{'is-selected-header':selectedDate.includes(header.date)}"
+            @click="tapHeader(header.date)"
           >
             {{ header.date }}
           </th>
@@ -18,6 +20,8 @@
             v-for="header in eventHeader"
             :key="header.date"
             :colspan="header.parts.length"
+            :class="{'is-selected-header':selectedDate.includes(header.date)}"
+            @click="tapHeader(header.date)"
           >
             {{ header.place }}
           </th>
@@ -41,7 +45,11 @@
           v-for="body in memberBody"
           :key="body.name"
         >
-          <th class="sticky">
+          <th
+            class="sticky"
+            :class="{'is-selected-member':selectedMember.includes(body.name)}"
+            @click="tapMemberName(body.name)"
+          >
             <div>
               {{ dName(body.name) }}
             </div>
@@ -96,10 +104,17 @@ const displayNumberMap = {
   19: '⓳',
   20: '⓴'
 }
+const toInt = str => parseInt(str.replace(/[^0-9^.]/g, ''), 10)
 const padding = num => num.toString().padStart(2, '0')
 export default {
   props: {
     events: { type: Array, required: true }
+  },
+  data: function () {
+    return {
+      selectedMember: [],
+      selectedDate: []
+    }
   },
   computed: {
     eventHeader () {
@@ -111,6 +126,7 @@ export default {
             parts: event.tickets.map(ticket => ticket.partName).filter(unique)
           }
         })
+        .sort((a, b) => this.selectedDate.includes(b.date) - this.selectedDate.includes(a.date) || toInt(a.date) - toInt(b.date))
     },
     memberBody () {
       return this.events.flatMap(event => event.tickets)
@@ -130,12 +146,26 @@ export default {
             status: status
           }
         })
-        .sort((a, b) => a.soldOut - b.soldOut || a.total - b.total)
+        .sort((a, b) => this.selectedMember.indexOf(b.name) - this.selectedMember.indexOf(a.name) || b.soldOut - a.soldOut || b.total - a.total)
     }
   },
   methods: {
     getAllNone (index) {
       return this.eventHeader[index].parts.map(_ => '-')
+    },
+    tapHeader (date) {
+      if (this.selectedDate.includes(date)) {
+        this.selectedDate = this.selectedDate.filter(x => x !== date)
+      } else {
+        this.selectedDate.unshift(date)
+      }
+    },
+    tapMemberName (name) {
+      if (this.selectedMember.includes(name)) {
+        this.selectedMember = this.selectedMember.filter(x => x !== name)
+      } else {
+        this.selectedMember.unshift(name)
+      }
     },
     dPart (part) {
       for (const [k, v] of Object.entries(displayPartMap)) {
@@ -229,6 +259,18 @@ table {
   position: sticky;
   left: 0;
   z-index: 1;
+  cursor: pointer;
+}
+
+.is-selected-header {
+  color: white;
+  background-color: #1f91ff;
+}
+
+.is-selected-member {
+  color: white;
+  background-color: #1f91ff;
+  border-bottom-color: #1f91ff;
 }
 
 .part-end:not(:last-child) {
