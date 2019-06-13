@@ -7,7 +7,8 @@ const config = {
   databaseURL: 'https://akuu-37e4b.firebaseio.com',
   projectId: 'akuu-37e4b',
   storageBucket: 'akuu-37e4b.appspot.com',
-  messagingSenderId: '975614918299'
+  messagingSenderId: '975614918299',
+  appId: '1:975614918299:web:4fd4d28005769fc1'
 }
 firebase.initializeApp(config)
 
