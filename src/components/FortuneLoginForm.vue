@@ -54,7 +54,7 @@
     </div>
     <input
       type="submit"
-      style="display:none"
+      style="display: none;"
     >
   </form>
 </template>
@@ -113,5 +113,3 @@ export default {
   }
 }
 </script>
-<style>
-</style>

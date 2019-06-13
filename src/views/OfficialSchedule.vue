@@ -300,14 +300,16 @@ export default {
 }
 </script>
 <style scoped>
-.official-schedule{
+.official-schedule {
   padding: 24px;
 }
-.box{
+
+.box {
   padding: 8px 12px;
   margin-bottom: 12px;
 }
-.item{
+
+.item {
   display: inline-block;
   padding: 4px 8px;
   margin-right: 4px;
@@ -315,38 +317,48 @@ export default {
   border: solid #4a4a4a 1px;
   border-radius: 16px;
 }
-.inline{
+
+.inline {
   display: inline;
 }
-.sticky{
+
+.sticky {
   position: sticky;
   top: 60px;
 }
-.subtitle{
+
+.subtitle {
   margin-bottom: 8px;
 }
-.separator{
+
+.separator {
   margin-top: 6px;
   margin-bottom: 8px;
   border-bottom: solid lightgray 2px;
 }
-.zenkoku{
+
+.zenkoku {
   background-color: #7fbfff;
 }
-.kobetsu{
+
+.kobetsu {
   background-color: #ffff7f;
 }
+
 .scale-down-enter-active {
   transform: scaleY(1);
   max-height: 163px;
   transition: all 200ms ease-in;
 }
+
 .scale-down-leave-active {
   transform: scaleY(1);
   max-height: 163px;
   transition: all 200ms ease-out;
 }
-.scale-down-enter, .scale-down-leave-to {
+
+.scale-down-enter,
+.scale-down-leave-to {
   transform: scaleY(0);
   max-height: 0;
 }

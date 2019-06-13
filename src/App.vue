@@ -16,20 +16,25 @@ export default {
 </script>
 <style lang="scss">
 @import "@/style/style.scss";
+
 #sticky-header {
   position: sticky;
   top: 0;
 }
+
 #sticky-footer {
   position: fixed;
   bottom: 0;
 }
+
 #main-content {
   padding-bottom: 72px;
 }
+
 .fade-enter-active {
   transition: opacity 100ms;
 }
+
 .fade-enter {
   opacity: 0;
 }

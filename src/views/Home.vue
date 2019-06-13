@@ -58,7 +58,7 @@
         <div @click="togglePastEvents">
           <h2
             class="subtitle"
-            style="display:inline"
+            style="display: inline;"
           >
             過去のイベント
           </h2>
@@ -164,7 +164,7 @@ export default {
 }
 </script>
 <style scoped>
-.top-margin{
+.top-margin {
   margin-top: 24px;
 }
 </style>

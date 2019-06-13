@@ -7,6 +7,8 @@
     "servefun": "npm --prefix ./functions run serve",
     "build": "vue-cli-service build",
     "lint": "vue-cli-service lint",
+    "lintcss": "stylelint \"**/*.vue\" \"**/*.css\" \"**/*.scss\"",
+    "fixcss": "stylelint \"**/*.vue\" \"**/*.css\" \"**/*.scss\" --fix",
     "deploy": "npm run build && firebase deploy --only hosting",
     "deployfun": "npm --prefix ./functions run deploy",
     "deploystore": "firebase deploy --only firestore"
@@ -35,6 +37,8 @@
     "eslint-plugin-vue": "^5.0.0",
     "node-sass": "^4.11.0",
     "sass-loader": "^7.1.0",
+    "stylelint": "^10.1.0",
+    "stylelint-config-standard": "^18.3.0",
     "vue-template-compiler": "^2.6.10"
   },
   "eslintConfig": {
