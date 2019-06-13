@@ -1,5 +1,5 @@
 <template>
-  <div class="soldOutTable">
+  <div>
     <table>
       <thead>
         <tr>
@@ -41,8 +41,8 @@
           v-for="body in memberBody"
           :key="body.name"
         >
-          <th>
-            <div class="member-name">
+          <th class="sticky">
+            <div>
               {{ dName(body.name) }}
             </div>
           </th>
@@ -161,46 +161,75 @@ export default {
   }
 }
 </script>
-<style scoped>
+<style lang="scss" scoped>
 table {
   border-collapse: separate;
   border-width: 0;
+
+  th,
+  td {
+    border-style: solid;
+    border-color: lightgray;
+    border-width: 0 2px 1px 0;
+  }
+
+  thead tr {
+    th {
+      padding: 8px 0;
+      border-width: 0 2px 2px 0;
+      border-right-color: #a0a0a0;
+
+      &:first-child {
+        border-right-color: lightgray;
+      }
+
+      &:last-child {
+        border-right-width: 0;
+      }
+    }
+  }
+
+  tbody tr {
+    * {
+      text-align: center;
+      vertical-align: middle;
+    }
+
+    td {
+      padding: 2px 0;
+      border-width: 0 2px 1px 0;
+    }
+
+    &:last-child {
+      th,
+      td {
+        border-bottom-width: 0;
+      }
+    }
+
+    &:first-child th {
+      border-bottom-width: 2px;
+
+      &:last-child {
+        border-right-width: 0;
+      }
+    }
+
+    td:last-child {
+      border-right-width: 0;
+    }
+  }
 }
-table th, td {
-  border-style: solid;
-  border-color: lightgray;
-}
-thead th {
-  padding: 8px 0;
-  border-width: 2px 2px 0 0;
-}
-thead th:first-child {
-  border-width: 2px 2px 0 2px;
-}
-thead th:nth-child(n+2):nth-last-child(n+2) {
-  border-right-color: #a0a0a0
-}
-tbody th, td {
-  text-align: center;
-  vertical-align: middle;
-  padding: 2px 0;
-  border-width: 0 2px 1px 0;
-}
-tbody tr:first-child th {
-  border-width: 2px 2px 1px 0;
-}
-tbody tr:first-child th:first-child {
-  border-width: 2px 2px 1px 2px;
-}
-tbody th:first-child{
+
+.sticky {
   min-width: 64px;
-  border-width: 0 2px 1px 2px;
   background: white;
   position: sticky;
   left: 0;
   z-index: 1;
 }
+
 .part-end:not(:last-child) {
-  border-right-color: #a0a0a0
+  border-right-color: #a0a0a0;
 }
 </style>

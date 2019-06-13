@@ -1,26 +1,24 @@
 <template>
   <div class="container">
-    <section
+    <div
       v-for="soldOut in soldOutList"
       :key="soldOut.goodsName"
-      class="section"
+      class="card"
     >
-      <div class="container">
-        <div
-          class="box"
-          :class="getTitleClass(soldOut.goodsName)"
-        >
-          <h2
-            class="subtitle"
-          >
-            {{ getTitle(soldOut.goodsName) }}
-          </h2>
-        </div>
-        <div class="sold-out-table">
+      <header
+        class="card-header"
+        :class="getTitleClass(soldOut.goodsName)"
+      >
+        <p class="card-header-title">
+          {{ getTitle(soldOut.goodsName) }}
+        </p>
+      </header>
+      <div class="card-content">
+        <div class="table-wrapper">
           <sold-out-table :events="soldOut.events" />
         </div>
       </div>
-    </section>
+    </div>
   </div>
 </template>
 <script>
@@ -48,8 +46,16 @@ export default {
   }
 }
 </script>
-<style>
-.sold-out-table {
+<style scoped>
+.card {
+  width: fit-content;
+}
+
+.card-content {
+  padding: 0;
+}
+
+.table-wrapper {
   overflow-x: auto;
 }
 </style>
