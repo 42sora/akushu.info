@@ -39,6 +39,7 @@
 </template>
 
 <script>
+import { unique } from '@/utils/ArrayUtil'
 export default {
   props: {
     tickets: { type: Array, required: true }
@@ -47,12 +48,12 @@ export default {
     tableData () {
       const parts = this.tickets
         .map(x => x.partName)
-        .filter((x, i, self) => self.indexOf(x) === i)
+        .filter(unique)
         .sort()
 
       const members = this.tickets
         .map(x => x.memberName)
-        .filter((x, i, self) => self.indexOf(x) === i)
+        .filter(unique)
 
       const table = []
 

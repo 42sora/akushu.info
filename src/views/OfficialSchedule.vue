@@ -120,6 +120,7 @@
   </div>
 </template>
 <script>
+import { unique } from '@/utils/ArrayUtil'
 const placeColors = [
   '#ffcce5',
   '#e5ccff',
@@ -184,8 +185,7 @@ export default {
       return results
     },
     allPlace () {
-      return this.sorted.map(schedule => schedule.place)
-        .filter((x, i, self) => self.indexOf(x) === i)
+      return this.sorted.map(schedule => schedule.place).filter(unique)
     },
     filteredGroups () {
       return this.displayFilter ? this.allGroups : this.groupFilter.slice().sort(sortSameAsMaster(this.allGroups))

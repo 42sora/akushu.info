@@ -79,6 +79,7 @@
 </template>
 <script>
 import { isPast } from '@/utils/DateStrComparer'
+import { unique } from '@/utils/ArrayUtil'
 import AkuCard from '@/components/AkuCard'
 import FortuneLoginForm from '@/components/FortuneLoginForm'
 import MemberFilter from '@/components/MemberFilter'
@@ -133,8 +134,9 @@ export default {
     },
     members () {
       return this.originEvents
-        .flatMap(event => event.tickets.map(x => x.memberName))
-        .filter((x, i, self) => self.indexOf(x) === i)
+        .flatMap(event => event.tickets)
+        .map(ticket => ticket.memberName)
+        .filter(unique)
     },
     scrapingState () {
       return this.$store.state.user.scrapingState

@@ -62,6 +62,7 @@
   </div>
 </template>
 <script>
+import { unique } from '@/utils/ArrayUtil'
 const displayPartMap = {
   '１部': 1,
   '２部': 2,
@@ -107,14 +108,14 @@ export default {
           return {
             date: /[0-9]+月[0-9]+日/.exec(event.eventDetail)[0],
             place: event.eventDetail.split('・').pop(),
-            parts: event.tickets.map(ticket => ticket.partName).filter((x, i, self) => self.indexOf(x) === i)
+            parts: event.tickets.map(ticket => ticket.partName).filter(unique)
           }
         })
     },
     memberBody () {
       return this.events.flatMap(event => event.tickets)
         .map(ticket => ticket.memberName)
-        .filter((x, i, self) => self.indexOf(x) === i)
+        .filter(unique)
         .map(member => {
           const status = this.events
             .map(event =>
