@@ -54,12 +54,18 @@
               {{ dName(body.name) }}
             </div>
           </th>
-          <td>{{ dTotal(body.soldOut,body.total) }}</td>
+          <td :class="{'is-sold-out':body.soldOut===body.total}">
+            {{ dTotal(body.soldOut,body.total) }}
+          </td>
           <template v-for="(status,i) in body.status">
             <td
               v-for="(state,j) in status"
               :key="i*1000+j"
-              :class="{'part-end':j+1===status.length}"
+              :class="{
+                'part-end':j+1===status.length,
+                'is-sold-out':status.every(state => state !== '*')&&!status.every(state => state === '-'),
+                'is-lastest':state===currentOrder-1
+              }"
             >
               {{ dState(state) }}
             </td>
@@ -108,6 +114,7 @@ const toInt = str => parseInt(str.replace(/[^0-9^.]/g, ''), 10)
 const padding = num => num.toString().padStart(2, '0')
 export default {
   props: {
+    eventName: { type: String, required: true },
     events: { type: Array, required: true }
   },
   data: function () {
@@ -147,6 +154,13 @@ export default {
           }
         })
         .sort((a, b) => this.selectedMember.indexOf(b.name) - this.selectedMember.indexOf(a.name) || b.soldOut - a.soldOut || b.total - a.total)
+    },
+    currentOrder () {
+      const parsed = /第([0-9]+)次/.exec(this.eventName)
+      if (parsed === null) {
+        return -1
+      }
+      return parseInt(parsed[1], 10)
     }
   },
   methods: {
@@ -260,6 +274,14 @@ table {
   left: 0;
   z-index: 1;
   cursor: pointer;
+}
+
+.is-sold-out {
+  background-color: #ffff3d;
+}
+
+.is-lastest {
+  color: #ff3d3d;
 }
 
 .is-selected-header {

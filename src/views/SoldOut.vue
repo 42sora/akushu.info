@@ -15,7 +15,10 @@
       </header>
       <div class="card-content">
         <div class="table-wrapper">
-          <sold-out-table :events="soldOut.events" />
+          <sold-out-table
+            :event-name="soldOut.goodsName"
+            :events="soldOut.events"
+          />
         </div>
       </div>
     </div>
