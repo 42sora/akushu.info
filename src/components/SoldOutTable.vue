@@ -111,6 +111,7 @@ const displayNumberMap = {
   20: '⓴'
 }
 const toInt = str => parseInt(str.replace(/[^0-9^.]/g, ''), 10)
+const cutDate = str => /[0-9]+月[0-9]+日/.exec(str)[0]
 const padding = num => num.toString().padStart(2, '0')
 export default {
   props: {
@@ -124,23 +125,26 @@ export default {
     }
   },
   computed: {
+    sortedEvents () {
+      return this.events.slice()
+        .sort((a, b) => this.isSelectedDate(b.eventDetail) - this.isSelectedDate(a.eventDetail) || toInt(a.eventDetail) - toInt(b.eventDetail))
+    },
     eventHeader () {
-      return this.events
+      return this.sortedEvents
         .map(event => {
           return {
-            date: /[0-9]+月[0-9]+日/.exec(event.eventDetail)[0],
+            date: cutDate(event.eventDetail),
             place: event.eventDetail.split('・').pop(),
             parts: event.tickets.map(ticket => ticket.partName).filter(unique)
           }
         })
-        .sort((a, b) => this.selectedDate.includes(b.date) - this.selectedDate.includes(a.date) || toInt(a.date) - toInt(b.date))
     },
     memberBody () {
       return this.events.flatMap(event => event.tickets)
         .map(ticket => ticket.memberName)
         .filter(unique)
         .map(member => {
-          const status = this.events
+          const status = this.sortedEvents
             .map(event =>
               event.tickets
                 .filter(ticket => ticket.memberName === member)
@@ -180,6 +184,9 @@ export default {
       } else {
         this.selectedMember.unshift(name)
       }
+    },
+    isSelectedDate (eventDetail) {
+      return this.selectedDate.includes(cutDate(eventDetail))
     },
     dPart (part) {
       for (const [k, v] of Object.entries(displayPartMap)) {
