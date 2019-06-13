@@ -130,6 +130,7 @@ export default {
             status: status
           }
         })
+        .sort((a, b) => a.soldOut - b.soldOut || a.total - b.total)
     }
   },
   methods: {
