@@ -2,8 +2,11 @@
   <div>
     <table>
       <thead>
-        <tr>
-          <th colspan="2" />
+        <flip-transition-tr>
+          <th
+            :key="'date-header-1'"
+            colspan="2"
+          />
           <th
             v-for="header in eventHeader"
             :key="header.date"
@@ -13,9 +16,12 @@
           >
             {{ header.date }}
           </th>
-        </tr>
-        <tr>
-          <th colspan="2" />
+        </flip-transition-tr>
+        <flip-transition-tr>
+          <th
+            :key="'place-header-1'"
+            colspan="2"
+          />
           <th
             v-for="header in eventHeader"
             :key="header.date"
@@ -25,12 +31,17 @@
           >
             {{ header.place }}
           </th>
-        </tr>
+        </flip-transition-tr>
       </thead>
-      <tbody class="is-size-7">
-        <tr>
-          <th />
-          <th>合計</th>
+      <flip-transition-tbody
+        class="is-size-7"
+        name="flip-fast"
+      >
+        <flip-transition-tr :key="'part-header'">
+          <th :key="'part-header-1'" />
+          <th :key="'part-header-2'">
+            合計
+          </th>
           <template v-for="header in eventHeader">
             <th
               v-for="(part,i) in header.parts"
@@ -40,27 +51,29 @@
               {{ dPart(part) }}
             </th>
           </template>
-        </tr>
-        <tr
+        </flip-transition-tr>
+        <flip-transition-tr
           v-for="body in memberBody"
           :key="body.name"
         >
           <th
+            :key="body.name+'-name'"
             class="sticky"
             :class="{'is-selected-member':selectedMember.includes(body.name)}"
             @click="tapMemberName(body.name)"
           >
-            <div>
-              {{ dName(body.name) }}
-            </div>
+            {{ dName(body.name) }}
           </th>
-          <td :class="{'is-sold-out':body.soldOut===body.total}">
+          <td
+            :key="body.name+'-total'"
+            :class="{'is-sold-out':body.soldOut===body.total}"
+          >
             {{ dTotal(body.soldOut,body.total) }}
           </td>
           <template v-for="(status,i) in body.status">
             <td
               v-for="(state,j) in status"
-              :key="i*1000+j"
+              :key="body.name+eventHeader[i].date+j"
               :class="{
                 'part-end':j+1===status.length,
                 'is-sold-out':status.every(state => state !== '*')&&!status.every(state => state === '-'),
@@ -70,13 +83,15 @@
               {{ dState(state) }}
             </td>
           </template>
-        </tr>
-      </tbody>
+        </flip-transition-tr>
+      </flip-transition-tbody>
     </table>
   </div>
 </template>
 <script>
 import { unique } from '@/utils/ArrayUtil'
+import FlipTransitionTr from '@/components/transitions/FlipTransitionTr'
+import FlipTransitionTbody from '@/components/transitions/FlipTransitionTbody'
 const displayPartMap = {
   '１部': 1,
   '２部': 2,
@@ -114,6 +129,7 @@ const toInt = str => parseInt(str.replace(/[^0-9^.]/g, ''), 10)
 const cutDate = str => /[0-9]+月[0-9]+日/.exec(str)[0]
 const padding = num => num.toString().padStart(2, '0')
 export default {
+  components: { FlipTransitionTr, FlipTransitionTbody },
   props: {
     eventName: { type: String, required: true },
     events: { type: Array, required: true }
@@ -219,6 +235,10 @@ table {
   border-collapse: separate;
   border-width: 0;
 
+  * {
+    background-color: white;
+  }
+
   th,
   td {
     border-style: solid;
@@ -276,11 +296,14 @@ table {
 
 .sticky {
   min-width: 64px;
-  background: white;
   position: sticky;
   left: 0;
   z-index: 1;
   cursor: pointer;
+}
+
+.part-end:not(:last-child) {
+  border-right-color: #a0a0a0;
 }
 
 .is-sold-out {
@@ -302,7 +325,11 @@ table {
   border-bottom-color: #1f91ff;
 }
 
-.part-end:not(:last-child) {
-  border-right-color: #a0a0a0;
+.flip-move {
+  transition: transform 600ms ease-in-out;
+}
+
+.flip-fast-move {
+  transition: transform 200ms ease-in-out;
 }
 </style>
