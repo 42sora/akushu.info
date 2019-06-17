@@ -11,7 +11,7 @@
             v-for="header in eventHeader"
             :key="header.date"
             :colspan="header.parts.length"
-            :class="{'is-selected-header':selectedDate.includes(header.date)}"
+            :class="{'is-selected-header':header.isSelected}"
             @click="tapHeader(header.date)"
           >
             {{ header.date }}
@@ -26,7 +26,7 @@
             v-for="header in eventHeader"
             :key="header.date"
             :colspan="header.parts.length"
-            :class="{'is-selected-header':selectedDate.includes(header.date)}"
+            :class="{'is-selected-header':header.isSelected}"
             @click="tapHeader(header.date)"
           >
             {{ header.place }}
@@ -52,14 +52,14 @@
             </th>
           </template>
         </flip-transition-tr>
-        <flip-transition-tr
+        <tr
           v-for="body in memberBody"
           :key="body.name"
         >
           <th
             :key="body.name+'-name'"
             class="sticky"
-            :class="{'is-selected-member':selectedMember.includes(body.name)}"
+            :class="{'is-selected-member':body.isSelected}"
             @click="tapMemberName(body.name)"
           >
             {{ dName(body.name) }}
@@ -83,7 +83,7 @@
               {{ dState(state) }}
             </td>
           </template>
-        </flip-transition-tr>
+        </tr>
       </flip-transition-tbody>
     </table>
   </div>
@@ -136,7 +136,7 @@ export default {
   },
   data: function () {
     return {
-      selectedMember: [],
+      selectedMembers: [],
       selectedDate: []
     }
   },
@@ -151,7 +151,8 @@ export default {
           return {
             date: cutDate(event.eventDetail),
             place: event.eventDetail.split('・').pop(),
-            parts: event.tickets.map(ticket => ticket.partName).filter(unique)
+            parts: event.tickets.map(ticket => ticket.partName).filter(unique),
+            isSelected: this.selectedDate.includes(cutDate(event.eventDetail))
           }
         })
     },
@@ -170,10 +171,11 @@ export default {
             name: member,
             soldOut: status.flat().reduce((total, state) => typeof state === 'number' ? ++total : total, 0),
             total: status.flat().reduce((total, state) => state !== '-' ? ++total : total, 0),
-            status: status
+            status: status,
+            isSelected: this.selectedMembers.includes(member)
           }
         })
-        .sort((a, b) => this.selectedMember.indexOf(b.name) - this.selectedMember.indexOf(a.name) || b.soldOut - a.soldOut || b.total - a.total)
+        .sort((a, b) => this.selectedMembers.indexOf(b.name) - this.selectedMembers.indexOf(a.name) || b.soldOut - a.soldOut || b.total - a.total)
     },
     currentOrder () {
       const parsed = /第([0-9]+)次/.exec(this.eventName)
@@ -195,10 +197,10 @@ export default {
       }
     },
     tapMemberName (name) {
-      if (this.selectedMember.includes(name)) {
-        this.selectedMember = this.selectedMember.filter(x => x !== name)
+      if (this.selectedMembers.includes(name)) {
+        this.selectedMembers = this.selectedMembers.filter(x => x !== name)
       } else {
-        this.selectedMember.unshift(name)
+        this.selectedMembers.unshift(name)
       }
     },
     isSelectedDate (eventDetail) {
@@ -326,10 +328,12 @@ table {
 }
 
 .flip-move {
-  transition: transform 600ms ease-in-out;
+  will-change: transform;
+  transition: transform 400ms ease;
 }
 
 .flip-fast-move {
-  transition: transform 200ms ease-in-out;
+  will-change: transform;
+  transition: transform 200ms ease;
 }
 </style>
