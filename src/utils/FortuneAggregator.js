@@ -4,7 +4,7 @@ const ticketsMerge = (tickets, addTicket) => {
     if (src.memberName === addTicket.memberName &&
       src.partName === addTicket.partName) {
       exists = true
-      src.amont += addTicket.amont
+      src.amount += addTicket.amount
     }
   }
   if (!exists) {
@@ -84,7 +84,7 @@ const toEvent = (entry, detail) => {
       {
         memberName: memberName,
         partName: partName,
-        amont: ticketAmont
+        amount: ticketAmont
       }
     ]
   }

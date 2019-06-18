@@ -49,7 +49,7 @@ interface FortuneEvent {
 interface Ticket {
   memberName: string
   partName: string
-  amont: number
+  amount: number
 }
 
 type State = 'WAITING' | 'EXECUTING' | 'COMPLETED' | 'LOGIN_FAILED' | 'SYSTEM_ERROR'

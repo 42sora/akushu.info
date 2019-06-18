@@ -67,7 +67,7 @@ export default {
         for (const part of parts) {
           const ticket = this.tickets.find(ticket => ticket.memberName === member && ticket.partName === part)
           if (ticket) {
-            row.push(ticket.amont)
+            row.push(ticket.amount)
           } else {
             row.push('-')
           }

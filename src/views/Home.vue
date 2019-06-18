@@ -135,7 +135,7 @@ export default {
     members () {
       return this.originEvents
         .flatMap(event => event.tickets)
-        .sort((a, b) => b.amont - a.amont)
+        .sort((a, b) => b.amount - a.amount)
         .map(ticket => ticket.memberName)
         .filter(unique)
     },
