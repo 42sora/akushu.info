@@ -175,7 +175,11 @@ export default {
             isSelected: this.selectedMembers.includes(member)
           }
         })
-        .sort((a, b) => this.selectedMembers.indexOf(b.name) - this.selectedMembers.indexOf(a.name) || b.soldOut - a.soldOut || b.total - a.total)
+        .sort((a, b) =>
+          this.selectedMembers.indexOf(b.name) - this.selectedMembers.indexOf(a.name) ||
+          b.soldOut - a.soldOut ||
+          b.total - a.total ||
+          a.status.flat().reduce((total, state) => typeof state === 'number' ? total + state : total, 0) - b.status.flat().reduce((total, state) => typeof state === 'number' ? total + state : total, 0))
     },
     currentOrder () {
       const parsed = /第([0-9]+)次/.exec(this.eventName)
