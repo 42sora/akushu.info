@@ -1,92 +1,90 @@
 <template>
-  <div>
-    <table>
-      <thead>
-        <flip-transition-tr>
-          <th
-            :key="'date-header-1'"
-            colspan="2"
-          />
-          <th
-            v-for="header in eventHeader"
-            :key="header.date"
-            :colspan="header.parts.length"
-            :class="{'is-selected-header':header.isSelected}"
-            @click="tapHeader(header.date)"
-          >
-            {{ header.date }}
-          </th>
-        </flip-transition-tr>
-        <flip-transition-tr>
-          <th
-            :key="'place-header-1'"
-            colspan="2"
-          />
-          <th
-            v-for="header in eventHeader"
-            :key="header.date"
-            :colspan="header.parts.length"
-            :class="{'is-selected-header':header.isSelected}"
-            @click="tapHeader(header.date)"
-          >
-            {{ header.place }}
-          </th>
-        </flip-transition-tr>
-      </thead>
-      <flip-transition-tbody
-        class="is-size-7"
-        name="flip-fast"
-      >
-        <flip-transition-tr :key="'part-header'">
-          <th :key="'part-header-1'" />
-          <th :key="'part-header-2'">
-            合計
-          </th>
-          <template v-for="header in eventHeader">
-            <th
-              v-for="(part,i) in header.parts"
-              :key="header.date + part"
-              :class="{'part-end':i+1===header.parts.length}"
-            >
-              {{ dPart(part) }}
-            </th>
-          </template>
-        </flip-transition-tr>
-        <tr
-          v-for="body in memberBody"
-          :key="body.name"
+  <table>
+    <thead>
+      <flip-transition-tr>
+        <th
+          :key="'date-header-1'"
+          colspan="2"
+        />
+        <th
+          v-for="header in eventHeader"
+          :key="header.date"
+          :colspan="header.parts.length"
+          :class="{'is-selected-header':header.isSelected}"
+          @click="tapHeader(header.date)"
         >
+          {{ header.date }}
+        </th>
+      </flip-transition-tr>
+      <flip-transition-tr>
+        <th
+          :key="'place-header-1'"
+          colspan="2"
+        />
+        <th
+          v-for="header in eventHeader"
+          :key="header.date"
+          :colspan="header.parts.length"
+          :class="{'is-selected-header':header.isSelected}"
+          @click="tapHeader(header.date)"
+        >
+          {{ header.place }}
+        </th>
+      </flip-transition-tr>
+    </thead>
+    <flip-transition-tbody
+      class="is-size-7"
+      name="flip-fast"
+    >
+      <flip-transition-tr :key="'part-header'">
+        <th :key="'part-header-1'" />
+        <th :key="'part-header-2'">
+          合計
+        </th>
+        <template v-for="header in eventHeader">
           <th
-            :key="body.name+'-name'"
-            class="sticky"
-            :class="{'is-selected-member':body.isSelected}"
-            @click="tapMemberName(body.name)"
+            v-for="(part,i) in header.parts"
+            :key="header.date + part"
+            :class="{'part-end':i+1===header.parts.length}"
           >
-            {{ dName(body.name) }}
+            {{ dPart(part) }}
           </th>
+        </template>
+      </flip-transition-tr>
+      <tr
+        v-for="body in memberBody"
+        :key="body.name"
+      >
+        <th
+          :key="body.name+'-name'"
+          class="sticky"
+          :class="{'is-selected-member':body.isSelected}"
+          @click="tapMemberName(body.name)"
+        >
+          {{ dName(body.name) }}
+        </th>
+        <td
+          :key="body.name+'-total'"
+          :class="{'is-sold-out':body.soldOut===body.total}"
+        >
+          {{ dTotal(body.soldOut,body.total) }}
+        </td>
+        <template v-for="(status,i) in body.status">
           <td
-            :key="body.name+'-total'"
-            :class="{'is-sold-out':body.soldOut===body.total}"
+            v-for="(state,j) in status"
+            :key="body.name+eventHeader[i].date+j"
+            :class="{
+              'part-end':j+1===status.length,
+              'is-sold-out':status.every(state => state !== '*')&&!status.every(state => state === '-'),
+              'is-lastest':state===currentOrder-1
+            }"
           >
-            {{ dTotal(body.soldOut,body.total) }}
+            {{ dState(state) }}
           </td>
-          <template v-for="(status,i) in body.status">
-            <td
-              v-for="(state,j) in status"
-              :key="body.name+eventHeader[i].date+j"
-              :class="{
-                'part-end':j+1===status.length,
-                'is-sold-out':status.every(state => state !== '*')&&!status.every(state => state === '-'),
-                'is-lastest':state===currentOrder-1
-              }"
-            >
-              {{ dState(state) }}
-            </td>
-          </template>
-        </tr>
-      </flip-transition-tbody>
-    </table>
-  </div>
+        </template>
+      </tr>
+    </flip-transition-tbody>
+  </table>
 </template>
 <script>
 import { unique } from '@/utils/ArrayUtil'

@@ -52,6 +52,11 @@ export default {
 <style scoped>
 .card {
   width: fit-content;
+  margin-bottom: 24px;
+}
+
+.card-header {
+  border-bottom: 2px solid lightgray;
 }
 
 .card-content {
