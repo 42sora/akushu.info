@@ -237,3 +237,36 @@ export const aggregateGoodsList = functions
     response.status(200).send({ message: "success", keys: Object.keys(goodsList) })
   })
 
+const authKey = "wu6n1lhwJdLFA9iFTl6v"
+interface registerMasterParam {
+  authKey: string,
+  document: string,
+  documentId: string,
+  data: any
+}
+export const registerMaster = functions
+  .region(REGION)
+  .runWith({
+    memory: '128MB'
+  })
+  .https.onRequest(async (request, response) => {
+    const body: registerMasterParam = request.body
+    console.log(body);
+    if (body.authKey !== authKey) {
+      response.status(400).send({ message: "auth failed" })
+      return
+    }
+
+    try {
+      const doc = await db.collection("public").doc(body.document)
+      await doc.update({
+        [body.documentId]: body.data
+      })
+
+    } catch (e) {
+      console.error(e)
+      response.status(500).send({ message: e })
+      throw e
+    }
+    response.status(200).send({ message: "success" })
+  })
