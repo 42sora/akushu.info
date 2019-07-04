@@ -19,7 +19,7 @@
           v-for="group in filteredGroups"
           :key="group"
           class="button item"
-          :class="getGroupFilterClass(group)"
+          :class="groupFilter.includes(group)?getBkColerClass(group):{}"
           @click="toggleGroupFilter(group)"
         >
           {{ group }}
@@ -31,7 +31,7 @@
             v-for="(group, name) in prefectureGroup"
             :key="name"
             class="button item"
-            :style="getPrefectureGroupStyle(group)"
+            :class="group.every(it => prefectureFilter.includes(it))?getBkColerClass(name):{}"
             @click="tapPrefectureGroup(group)"
           >
             {{ name }}
@@ -41,7 +41,7 @@
           v-for="prefecture in filteredPrefectures"
           :key="prefecture"
           class="button item"
-          :style="getPrefectureFilterStyle(prefecture)"
+          :class="prefectureFilter.includes(prefecture)?getBkColerClass(prefecture):{}"
           @click="togglePrefectureFilter(prefecture)"
         >
           {{ prefecture }}
@@ -52,7 +52,7 @@
           v-for="eventType in filteredEventTypes"
           :key="eventType"
           class="button item"
-          :class="getEventTypeFilterClass(eventType) "
+          :class="eventTypeFilter.includes(eventType)?getBkColerClass(eventType):{}"
           @click="toggleEventTypeFilter(eventType)"
         >
           {{ eventType }}
@@ -90,7 +90,7 @@
         >
           <div
             class="item"
-            :class="getGroupNameClass(item.groupName)"
+            :class="getBkColerClass(item.groupName)"
             @click="toggleGroupFilter(item.groupName)"
           >
             {{ item.groupName }} {{ item.goodsNumber }}
@@ -98,14 +98,14 @@
           </div>
           <div
             class="item"
-            :style="getPlaceStyle(item.place)"
+            :class="getBkColerClass(item.place)"
             @click="togglePrefectureFilter(item.place.split(':')[0])"
           >
             {{ item.place }}
           </div>
           <div
             class="item"
-            :class="getEventTypeClass(item.eventType)"
+            :class="getBkColerClass(item.eventType)"
             @click="toggleEventTypeFilter(item.eventType)"
           >
             {{ item.eventType }}
@@ -121,16 +121,6 @@
 </template>
 <script>
 import { unique } from '@/utils/ArrayUtil'
-const placeColors = [
-  '#ffcce5',
-  '#e5ccff',
-  '#ccccff',
-  '#cce5ff',
-  '#ccffe5',
-  '#e5ffcc',
-  '#ffffcc',
-  '#ffe5cc'
-]
 const getNowYear = () => new Date().getFullYear()
 const getNowMonth = () => new Date().getMonth() + 1
 const getNowDay = () => new Date().getDate()
@@ -243,57 +233,23 @@ export default {
     toDisplayDate (date) {
       return date.split('年')[1]
     },
-    getGroupNameClass (groupName) {
+    getBkColerClass (value) {
       return {
-        'bk-coler-nogi': groupName.includes('乃木坂'),
-        'bk-coler-keyaki': groupName.includes('欅坂'),
-        'bk-coler-yoshimoto': groupName.includes('吉本坂'),
-        'bk-coler-hinata': groupName.includes('日向坂')
-      }
-    },
-    getEventTypeClass (eventType) {
-      return {
-        'zenkoku': eventType.includes('全国'),
-        'kobetsu': eventType.includes('個別')
-      }
-    },
-    getPlaceStyle (place) {
-      const placeIndex = this.allPlace.indexOf(place)
-      const color = placeColors[placeIndex % placeColors.length]
-      return {
-        'background-color': color
-      }
-    },
-    getGroupFilterClass (group) {
-      if (this.groupFilter.includes(group)) {
-        return this.getGroupNameClass(group)
-      } else {
-        return {}
-      }
-    },
-    getEventTypeFilterClass (EventType) {
-      if (this.eventTypeFilter.includes(EventType)) {
-        return this.getEventTypeClass(EventType)
-      } else {
-        return {}
-      }
-    },
-    getPrefectureFilterStyle (prefecture) {
-      if (this.prefectureFilter.includes(prefecture)) {
-        const findPlace = this.allPlace.find(place => place.includes(prefecture))
-        if (findPlace === undefined) {
-          return { 'background-color': '#e0e0e0' }
-        }
-        return this.getPlaceStyle(findPlace)
-      } else {
-        return {}
-      }
-    },
-    getPrefectureGroupStyle (prefectureGroup) {
-      if (prefectureGroup.every(g => this.prefectureFilter.includes(g))) {
-        return { 'background-color': '#ff7fbf' }
-      } else {
-        return {}
+        'bk-coler-nogi': value.includes('乃木坂'),
+        'bk-coler-keyaki': value.includes('欅坂'),
+        'bk-coler-yoshimoto': value.includes('吉本坂'),
+        'bk-coler-hinata': value.includes('日向坂'),
+        'bk-coler-zenkoku': value.includes('全国'),
+        'bk-coler-kobetsu': value.includes('個別'),
+        'bk-coler-miyagi': value.includes('宮城'),
+        'bk-coler-chiba': value.includes('千葉'),
+        'bk-coler-tokyo': value.includes('東京'),
+        'bk-coler-kanagawa': value.includes('神奈川'),
+        'bk-coler-aichi': value.includes('愛知'),
+        'bk-coler-kyoto': value.includes('京都'),
+        'bk-coler-osaka': value.includes('大阪'),
+        'bk-coler-kanto': value.includes('関東'),
+        'bk-coler-kansai': value.includes('関西')
       }
     }
   }
@@ -335,14 +291,6 @@ export default {
   margin-top: 6px;
   margin-bottom: 8px;
   border-bottom: solid lightgray 2px;
-}
-
-.zenkoku {
-  background-color: #7fbfff;
-}
-
-.kobetsu {
-  background-color: #ffff7f;
 }
 
 .scale-down-enter-active {
