@@ -1,139 +1,41 @@
 <template>
   <div class="official-schedule container">
-    <div
+    <schedule-filter
       class="box"
-      :class="filterBoxClass"
-    >
-      <button
-        v-if="filterBoxState==='close'"
-        class="button is-white is-fullwidth"
-        @click="displayFilter=!displayFilter"
-      >
-        <span>絞り込む</span>
-        <span class="icon">
-          <font-awesome-icon icon="angle-down" />
-        </span>
-      </button>
-      <div :class="{'inline':filterBoxState==='minimum'}">
-        <button
-          v-for="group in filteredGroups"
-          :key="group"
-          class="button item"
-          :class="groupFilter.includes(group)?getBkColerClass(group):{}"
-          @click="toggleGroupFilter(group)"
-        >
-          {{ group }}
-        </button>
-      </div>
-      <div :class="{'inline':filterBoxState==='minimum'}">
-        <template v-if="filterBoxState==='full'">
-          <button
-            v-for="(group, name) in prefectureGroup"
-            :key="name"
-            class="button item"
-            :class="group.every(it => prefectureFilter.includes(it))?getBkColerClass(name):{}"
-            @click="tapPrefectureGroup(group)"
-          >
-            {{ name }}
-          </button>
-        </template>
-        <button
-          v-for="prefecture in filteredPrefectures"
-          :key="prefecture"
-          class="button item"
-          :class="prefectureFilter.includes(prefecture)?getBkColerClass(prefecture):{}"
-          @click="togglePrefectureFilter(prefecture)"
-        >
-          {{ prefecture }}
-        </button>
-      </div>
-      <div :class="{'inline':filterBoxState==='minimum'}">
-        <button
-          v-for="eventType in filteredEventTypes"
-          :key="eventType"
-          class="button item"
-          :class="eventTypeFilter.includes(eventType)?getBkColerClass(eventType):{}"
-          @click="toggleEventTypeFilter(eventType)"
-        >
-          {{ eventType }}
-        </button>
-      </div>
-      <button
-        v-if="filterBoxState!=='close'"
-        class="button is-white is-fullwidth"
-        @click="displayFilter=!displayFilter"
-      >
-        <span class="icon">
-          <font-awesome-icon
-            v-if="filterBoxState==='full'"
-            icon="angle-double-up"
-          />
-          <font-awesome-icon
-            v-if="filterBoxState==='minimum'"
-            icon="angle-down"
-          />
-        </span>
-      </button>
-    </div>
+      :class="filterClass"
+      :group-filter="groupFilter"
+      :prefecture-filter="prefectureFilter"
+      :event-type-filter="eventTypeFilter"
+      @click-group="toggleGroupFilter"
+      @click-prefecture="togglePrefectureFilter"
+      @click-event="toggleEventTypeFilter"
+      @chenge-state="filterState=$event"
+    />
     <transition-group name="scale-down">
-      <div
+      <schedule-box
         v-for="schedule in schedules"
         :key="schedule[0].date"
+        :schedule="schedule"
         class="box"
-      >
-        <h2 class="subtitle has-text-weight-bold">
-          {{ toDisplayDate(schedule[0].date) }}
-        </h2>
-        <div
-          v-for="(item, index) in schedule"
-          :key="item.goodsName"
-        >
-          <div
-            class="item"
-            :class="getBkColerClass(item.groupName)"
-            @click="toggleGroupFilter(item.groupName)"
-          >
-            {{ item.groupName }} {{ item.goodsNumber }}
-            <span class="is-hidden-mobile">「{{ item.goodsName }}」</span>
-          </div>
-          <div
-            class="item"
-            :class="getBkColerClass(item.place)"
-            @click="togglePrefectureFilter(item.place.split(':')[0])"
-          >
-            {{ item.place }}
-          </div>
-          <div
-            class="item"
-            :class="getBkColerClass(item.eventType)"
-            @click="toggleEventTypeFilter(item.eventType)"
-          >
-            {{ item.eventType }}
-          </div>
-          <div
-            v-if="index!==schedule.length-1"
-            class="separator"
-          />
-        </div>
-      </div>
+        @click-group="toggleGroupFilter"
+        @click-prefecture="togglePrefectureFilter"
+        @click-event="toggleEventTypeFilter"
+      />
     </transition-group>
   </div>
 </template>
 <script>
-import { unique } from '@/utils/ArrayUtil'
+import ScheduleFilter from '@/components/ScheduleFilter'
+import ScheduleBox from '@/components/ScheduleBox'
 const getNowYear = () => new Date().getFullYear()
 const getNowMonth = () => new Date().getMonth() + 1
 const getNowDay = () => new Date().getDate()
-const sortSameAsMaster = master => (a, b) => master.indexOf(a) - master.indexOf(b)
 export default {
   name: 'OfficialSchedule',
+  components: { ScheduleFilter, ScheduleBox },
   data: function () {
     return {
-      displayFilter: false,
-      allGroups: [ '乃木坂46', '欅坂46', '日向坂46', '吉本坂46' ],
-      prefectureGroup: { '関東': ['千葉', '東京', '神奈川'], '関西': ['京都', '大阪'] },
-      prefectures: ['宮城', '千葉', '東京', '神奈川', '愛知', '京都', '大阪'],
-      eventTypes: ['個別握手会', '全国握手会'],
+      filterState: '',
       groupFilter: [],
       prefectureFilter: [],
       eventTypeFilter: []
@@ -174,82 +76,32 @@ export default {
       }
       return results
     },
-    allPlace () {
-      return this.sorted.map(schedule => schedule.place).filter(unique)
-    },
-    filteredGroups () {
-      return this.displayFilter ? this.allGroups : this.groupFilter.slice().sort(sortSameAsMaster(this.allGroups))
-    },
-    filteredPrefectures () {
-      return this.displayFilter ? this.prefectures : this.prefectureFilter.slice().sort(sortSameAsMaster(this.prefectures))
-    },
-    filteredEventTypes () {
-      return this.displayFilter ? this.eventTypes : this.eventTypeFilter.slice().sort(sortSameAsMaster(this.eventTypes))
-    },
-    filterBoxState () {
-      if (this.displayFilter) {
-        return 'full'
-      } else if (this.groupFilter.length > 0 || this.prefectureFilter.length > 0 || this.eventTypeFilter.length > 0) {
-        return 'minimum'
-      } else {
-        return 'close'
-      }
-    },
-    filterBoxClass () {
+    filterClass () {
       return {
-        sticky: this.filterBoxState !== 'close'
+        sticky: this.filterState !== 'close'
       }
     }
   },
   methods: {
     toggleGroupFilter (group) {
-      if (this.groupFilter.some(x => x === group)) {
+      if (this.groupFilter.includes(group)) {
         this.groupFilter = this.groupFilter.filter(x => x !== group)
       } else {
         this.groupFilter.push(group)
       }
     },
-    tapPrefectureGroup (prefectureGroup) {
-      if (prefectureGroup.every(g => this.prefectureFilter.includes(g))) {
-        this.prefectureFilter = this.prefectureFilter.filter(x => !prefectureGroup.includes(x))
-      } else {
-        this.prefectureFilter.push(...prefectureGroup)
-      }
-    },
     togglePrefectureFilter (prefecture) {
-      if (this.prefectureFilter.some(x => x === prefecture)) {
+      if (this.prefectureFilter.includes(prefecture)) {
         this.prefectureFilter = this.prefectureFilter.filter(x => x !== prefecture)
       } else {
         this.prefectureFilter.push(prefecture)
       }
     },
     toggleEventTypeFilter (eventType) {
-      if (this.eventTypeFilter.some(x => x === eventType)) {
+      if (this.eventTypeFilter.includes(eventType)) {
         this.eventTypeFilter = this.eventTypeFilter.filter(x => x !== eventType)
       } else {
         this.eventTypeFilter.push(eventType)
-      }
-    },
-    toDisplayDate (date) {
-      return date.split('年')[1]
-    },
-    getBkColerClass (value) {
-      return {
-        'bk-coler-nogi': value.includes('乃木坂'),
-        'bk-coler-keyaki': value.includes('欅坂'),
-        'bk-coler-yoshimoto': value.includes('吉本坂'),
-        'bk-coler-hinata': value.includes('日向坂'),
-        'bk-coler-zenkoku': value.includes('全国'),
-        'bk-coler-kobetsu': value.includes('個別'),
-        'bk-coler-miyagi': value.includes('宮城'),
-        'bk-coler-chiba': value.includes('千葉'),
-        'bk-coler-tokyo': value.includes('東京'),
-        'bk-coler-kanagawa': value.includes('神奈川'),
-        'bk-coler-aichi': value.includes('愛知'),
-        'bk-coler-kyoto': value.includes('京都'),
-        'bk-coler-osaka': value.includes('大阪'),
-        'bk-coler-kanto': value.includes('関東'),
-        'bk-coler-kansai': value.includes('関西')
       }
     }
   }
@@ -257,7 +109,7 @@ export default {
 </script>
 <style scoped>
 .official-schedule {
-  padding: 24px;
+  padding: 8px 24px;
 }
 
 .box {
@@ -265,32 +117,9 @@ export default {
   margin-bottom: 12px;
 }
 
-.item {
-  display: inline-block;
-  padding: 4px 8px;
-  margin-right: 4px;
-  margin-bottom: 4px;
-  border: solid #4a4a4a 1px;
-  border-radius: 16px;
-}
-
-.inline {
-  display: inline;
-}
-
 .sticky {
   position: sticky;
   top: 60px;
-}
-
-.subtitle {
-  margin-bottom: 8px;
-}
-
-.separator {
-  margin-top: 6px;
-  margin-bottom: 8px;
-  border-bottom: solid lightgray 2px;
 }
 
 .scale-down-enter-active {
