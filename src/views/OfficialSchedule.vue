@@ -13,7 +13,7 @@
     />
     <transition-group name="scale-down">
       <schedule-box
-        v-for="schedule in schedules"
+        v-for="schedule in futureSchedules"
         :key="schedule[0].date"
         :schedule="schedule"
         class="box"
@@ -22,40 +22,67 @@
         @click-event="toggleEventTypeFilter"
       />
     </transition-group>
+    <toggle-panel class="top-margin">
+      <template v-slot:button>
+        <h2
+          class="subtitle"
+          style="display: inline;"
+        >
+          過去のイベント
+        </h2>
+        <span class="icon">
+          <font-awesome-icon icon="angle-down" />
+        </span>
+      </template>
+      <template v-slot:content>
+        <transition-group name="scale-down">
+          <schedule-box
+            v-for="schedule in pastSchedules"
+            :key="schedule[0].date"
+            :schedule="schedule"
+            class="box"
+            @click-group="toggleGroupFilter"
+            @click-prefecture="togglePrefectureFilter"
+            @click-event="toggleEventTypeFilter"
+          />
+        </transition-group>
+      </template>
+    </toggle-panel>
   </div>
 </template>
 <script>
 import ScheduleFilter from '@/components/ScheduleFilter'
 import ScheduleBox from '@/components/ScheduleBox'
+import TogglePanel from '@/components/TogglePanel'
+const toInt = str => parseInt(str.replace(/[^0-9^.]/g, ''), 10)
 const getNowYear = () => new Date().getFullYear()
 const getNowMonth = () => new Date().getMonth() + 1
 const getNowDay = () => new Date().getDate()
+
+const toYear = date => toInt(date.split('年')[0])
+const toMonth = date => toInt(date.split('年')[1].split('月')[0])
+const toDay = date => toInt(date.split('月')[1])
+const isFuture = date =>
+  toYear(date) > getNowYear() ||
+  (toYear(date) === getNowYear() && toMonth(date) > getNowMonth()) ||
+  (toYear(date) === getNowYear() && toMonth(date) === getNowMonth() && toDay(date) >= getNowDay())
+
 export default {
   name: 'OfficialSchedule',
-  components: { ScheduleFilter, ScheduleBox },
+  components: { ScheduleFilter, ScheduleBox, TogglePanel },
   data: function () {
     return {
       filterState: '',
       groupFilter: [],
       prefectureFilter: [],
-      eventTypeFilter: []
+      eventTypeFilter: [],
+      displayPastSchedules: false
     }
   },
   computed: {
     sorted () {
-      const toInt = str => parseInt(str.replace(/[^0-9^.]/g, ''), 10)
-      const getYear = date => toInt(date.split('年')[0])
-      const getMonth = date => toInt(date.split('年')[1].split('月')[0])
-      const getDay = date => toInt(date.split('月')[1])
-      const isFuture = date =>
-        getYear(date) > getNowYear() ||
-       (getYear(date) === getNowYear() && getMonth(date) > getNowMonth()) ||
-       (getYear(date) === getNowYear() && getMonth(date) === getNowMonth() && getDay(date) >= getNowDay())
-      const compare = (a, b) => getYear(a.date) - getYear(b.date) || getMonth(a.date) - getMonth(b.date) || getDay(a.date) - getDay(b.date)
-
-      return this.$store.state.public.officialSchedule.akushu.slice()
-        .filter(schedule => isFuture(schedule.date))
-        .sort(compare)
+      const compare = (a, b) => toYear(a.date) - toYear(b.date) || toMonth(a.date) - toMonth(b.date) || toDay(a.date) - toDay(b.date)
+      return this.$store.state.public.officialSchedule.akushu.slice().sort(compare)
     },
     filtered () {
       return this.sorted
@@ -75,6 +102,12 @@ export default {
         before = current
       }
       return results
+    },
+    futureSchedules () {
+      return this.schedules.filter(schedule => isFuture(schedule[0].date))
+    },
+    pastSchedules () {
+      return this.schedules.filter(schedule => !isFuture(schedule[0].date)).reverse()
     },
     filterClass () {
       return {
@@ -103,6 +136,9 @@ export default {
       } else {
         this.eventTypeFilter.push(eventType)
       }
+    },
+    togglePastSchedules () {
+      this.displayPastSchedules = !this.displayPastSchedules
     }
   }
 }
@@ -120,6 +156,10 @@ export default {
 .sticky {
   position: sticky;
   top: 60px;
+}
+
+.top-margin {
+  margin-top: 24px;
 }
 
 .scale-down-enter-active {

@@ -51,11 +51,11 @@
         :key="event.eventDate"
         :event="event"
       />
-      <div
+      <toggle-panel
         v-if="pastEvents.length>0"
         class="top-margin"
       >
-        <div @click="togglePastEvents">
+        <template v-slot:button>
           <h2
             class="subtitle"
             style="display: inline;"
@@ -65,15 +65,15 @@
           <span class="icon">
             <font-awesome-icon icon="angle-down" />
           </span>
-        </div>
-        <template v-if="displayPastEvents">
+        </template>
+        <template v-slot:content>
           <aku-card
             v-for="event in pastEvents"
             :key="event.eventDate"
             :event="event"
           />
         </template>
-      </div>
+      </toggle-panel>
     </div>
   </div>
 </template>
@@ -84,6 +84,7 @@ import AkuCard from '@/components/AkuCard'
 import FortuneLoginForm from '@/components/FortuneLoginForm'
 import MemberFilter from '@/components/MemberFilter'
 import ScrapingProgress from '@/components/ScrapingProgress'
+import TogglePanel from '@/components/TogglePanel'
 
 const getNowDateStr = () => {
   const now = new Date()
@@ -95,12 +96,11 @@ const getNowDateStr = () => {
 
 export default {
   name: 'Home',
-  components: { AkuCard, FortuneLoginForm, MemberFilter, ScrapingProgress },
+  components: { AkuCard, FortuneLoginForm, MemberFilter, ScrapingProgress, TogglePanel },
   data: function () {
     return {
       isFortuneLogin: false,
-      filter: [],
-      displayPastEvents: false
+      filter: []
     }
   },
   computed: {
@@ -152,9 +152,6 @@ export default {
     },
     hideFortuneLoginForm () {
       this.isFortuneLogin = false
-    },
-    togglePastEvents () {
-      this.displayPastEvents = !this.displayPastEvents
     },
     async startScrapping (event) {
       const startScraping = this.$functions.httpsCallable('startScraping')
