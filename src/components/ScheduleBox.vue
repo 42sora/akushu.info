@@ -1,7 +1,7 @@
 <template>
   <div>
     <h2 class="subtitle has-text-weight-bold">
-      {{ toDisplayDate(schedule[0].date) }}
+      {{ schedule[0].date }}
     </h2>
     <div
       v-for="(item, index) in schedule"
@@ -43,10 +43,7 @@ export default {
     schedule: { type: Array, required: true }
   },
   methods: {
-    getBkColerClass,
-    toDisplayDate (date) {
-      return date.split('年')[1]
-    }
+    getBkColerClass
   }
 }
 </script>
