@@ -11,7 +11,7 @@
       @click-event="toggleEventTypeFilter"
       @chenge-state="filterState=$event"
     />
-    <transition-group name="scale-down">
+    <scale-down-transition-group>
       <schedule-box
         v-for="schedule in futureSchedules"
         :key="schedule[0].date"
@@ -21,7 +21,7 @@
         @click-prefecture="togglePrefectureFilter"
         @click-event="toggleEventTypeFilter"
       />
-    </transition-group>
+    </scale-down-transition-group>
     <toggle-panel class="top-margin">
       <template v-slot:button>
         <h2
@@ -35,7 +35,7 @@
         </span>
       </template>
       <template v-slot:content>
-        <transition-group name="scale-down">
+        <scale-down-transition-group>
           <schedule-box
             v-for="schedule in pastSchedules"
             :key="schedule[0].date"
@@ -45,7 +45,7 @@
             @click-prefecture="togglePrefectureFilter"
             @click-event="toggleEventTypeFilter"
           />
-        </transition-group>
+        </scale-down-transition-group>
       </template>
     </toggle-panel>
   </div>
@@ -54,6 +54,7 @@
 import ScheduleFilter from '@/components/ScheduleFilter'
 import ScheduleBox from '@/components/ScheduleBox'
 import TogglePanel from '@/components/TogglePanel'
+import ScaleDownTransitionGroup from '@/components/transitions/ScaleDownTransitionGroup'
 const toInt = str => parseInt(str.replace(/[^0-9^.]/g, ''), 10)
 const getNowYear = () => new Date().getFullYear()
 const getNowMonth = () => new Date().getMonth() + 1
@@ -69,7 +70,7 @@ const isFuture = date =>
 
 export default {
   name: 'OfficialSchedule',
-  components: { ScheduleFilter, ScheduleBox, TogglePanel },
+  components: { ScheduleFilter, ScheduleBox, TogglePanel, ScaleDownTransitionGroup },
   data: function () {
     return {
       filterState: '',
@@ -160,23 +161,5 @@ export default {
 
 .top-margin {
   margin-top: 24px;
-}
-
-.scale-down-enter-active {
-  transform: scaleY(1);
-  max-height: 163px;
-  transition: all 200ms ease-in;
-}
-
-.scale-down-leave-active {
-  transform: scaleY(1);
-  max-height: 163px;
-  transition: all 200ms ease-out;
-}
-
-.scale-down-enter,
-.scale-down-leave-to {
-  transform: scaleY(0);
-  max-height: 0;
 }
 </style>
