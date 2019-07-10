@@ -237,7 +237,6 @@ export const aggregateGoodsList = functions
     response.status(200).send({ message: "success", keys: Object.keys(goodsList) })
   })
 
-const authKey = "wu6n1lhwJdLFA9iFTl6v"
 interface registerMasterParam {
   authKey: string,
   document: string,
@@ -252,6 +251,8 @@ export const registerMaster = functions
   .https.onRequest(async (request, response) => {
     const body: registerMasterParam = request.body
     console.log(body);
+
+    const authKey = functions.config().fortune.auth.key
     if (body.authKey !== authKey) {
       response.status(400).send({ message: "auth failed" })
       return
