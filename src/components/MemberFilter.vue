@@ -88,7 +88,7 @@ export default {
 </script>
 <style scoped>
 .dropdown-content {
-  overflow-y: scroll;
   max-height: 247px;
+  overflow-y: scroll;
 }
 </style>

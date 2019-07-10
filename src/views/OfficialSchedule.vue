@@ -150,8 +150,8 @@ export default {
 }
 
 .box {
-  padding: 8px 12px;
   margin-bottom: 12px;
+  padding: 8px 12px;
 }
 
 .sticky {

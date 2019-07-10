@@ -23,8 +23,8 @@ export default {
 }
 
 #sticky-footer {
-  position: fixed;
   bottom: 0;
+  position: fixed;
 }
 
 #main-content {

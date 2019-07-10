@@ -59,9 +59,9 @@ export default {
 </script>
 <style scoped>
 .main-footer {
-  width: 100vw;
   background-color: lavenderblush;
   padding: 12px 24px;
+  width: 100vw;
   z-index: 100;
 }
 </style>

@@ -51,8 +51,8 @@ export default {
 </script>
 <style scoped>
 .card {
-  width: fit-content;
   margin-bottom: 24px;
+  width: fit-content;
 }
 
 .card-header {

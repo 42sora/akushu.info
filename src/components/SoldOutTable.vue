@@ -264,16 +264,16 @@ table {
 
   th,
   td {
-    border-style: solid;
     border-color: lightgray;
+    border-style: solid;
     border-width: 0 2px 1px 0;
   }
 
   thead tr {
     th {
-      padding: 8px 0;
-      border-width: 0 2px 2px 0;
       border-right-color: #a0a0a0;
+      border-width: 0 2px 2px 0;
+      padding: 8px 0;
 
       &:first-child {
         border-right-color: lightgray;
@@ -292,20 +292,20 @@ table {
     }
 
     td {
-      padding: 1px 0;
       border-width: 0 2px 1px 0;
+      padding: 1px 0;
       position: relative;
 
       .tooltip .text {
-        white-space: nowrap;
-        padding: 5px 10px;
+        background-color: black;
         border-radius: 10px;
         color: white;
-        background-color: black;
-        visibility: hidden;
         opacity: 0;
-        z-index: 2;
+        padding: 5px 10px;
         position: absolute;
+        visibility: hidden;
+        white-space: nowrap;
+        z-index: 2;
 
         &.top {
           bottom: 70%;
@@ -325,13 +325,13 @@ table {
       }
 
       &:hover {
-        color: white;
         background-color: #1f91ff;
+        color: white;
 
         .tooltip .text {
-          visibility: visible;
           opacity: 0.8;
           transition: opacity 800ms cubic-bezier(1, 0, 0.5, 0);
+          visibility: visible;
         }
       }
     }
@@ -358,11 +358,11 @@ table {
 }
 
 .sticky {
+  cursor: pointer;
+  left: 0;
   min-width: 64px;
   position: sticky;
-  left: 0;
   z-index: 1;
-  cursor: pointer;
 }
 
 .part-end:not(:last-child) {
@@ -378,23 +378,23 @@ table {
 }
 
 .is-selected-header {
-  color: white;
   background-color: #1f91ff;
+  color: white;
 }
 
 .is-selected-member {
-  color: white;
   background-color: #1f91ff;
   border-bottom-color: #1f91ff;
+  color: white;
 }
 
 .flip-move {
-  will-change: transform;
   transition: transform 400ms ease;
+  will-change: transform;
 }
 
 .flip-fast-move {
-  will-change: transform;
   transition: transform 200ms ease;
+  will-change: transform;
 }
 </style>

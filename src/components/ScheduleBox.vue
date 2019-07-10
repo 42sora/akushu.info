@@ -53,17 +53,17 @@ export default {
 }
 
 .item {
-  display: inline-block;
-  padding: 4px 8px;
-  margin-right: 4px;
-  margin-bottom: 4px;
   border: solid #4a4a4a 1px;
   border-radius: 16px;
+  display: inline-block;
+  margin-bottom: 4px;
+  margin-right: 4px;
+  padding: 4px 8px;
 }
 
 .separator {
-  margin-top: 6px;
-  margin-bottom: 8px;
   border-bottom: solid lightgray 2px;
+  margin-bottom: 8px;
+  margin-top: 6px;
 }
 </style>
