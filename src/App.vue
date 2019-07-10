@@ -1,31 +1,41 @@
 <template>
   <div id="app">
-    <div id="nav">
-      <router-link to="/">Home</router-link> |
-      <router-link to="/about">About</router-link>
-    </div>
-    <router-view/>
+    <main-nav id="sticky-header" />
+    <transition name="fade">
+      <router-view id="main-content" />
+    </transition>
+    <main-footer id="sticky-footer" />
   </div>
 </template>
-
-<style>
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
+<script>
+import MainNav from '@/components/MainNav'
+import MainFooter from '@/components/MainFooter'
+export default {
+  components: { MainNav, MainFooter }
 }
-#nav {
-  padding: 30px;
-}
+</script>
+<style lang="scss">
+@import "@/style/style.scss";
 
-#nav a {
-  font-weight: bold;
-  color: #2c3e50;
+#sticky-header {
+  position: sticky;
+  top: 0;
 }
 
-#nav a.router-link-exact-active {
-  color: #42b983;
+#sticky-footer {
+  bottom: 0;
+  position: fixed;
+}
+
+#main-content {
+  padding-bottom: 72px;
+}
+
+.fade-enter-active {
+  transition: opacity 100ms;
+}
+
+.fade-enter {
+  opacity: 0;
 }
 </style>

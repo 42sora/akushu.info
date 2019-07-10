@@ -1,25 +1,59 @@
 import Vue from 'vue'
 import Router from 'vue-router'
+import store from './store'
 import Home from './views/Home.vue'
+import SoldOut from './views/SoldOut.vue'
+import OfficialSchedule from './views/OfficialSchedule.vue'
+import NotFound from './views/NotFound.vue'
+import SignIn from './views/SignIn.vue'
 
 Vue.use(Router)
 
-export default new Router({
+const router = new Router({
   mode: 'history',
   base: process.env.BASE_URL,
   routes: [
     {
       path: '/',
       name: 'home',
+      meta: { requiresAuth: true },
       component: Home
-    },
-    {
-      path: '/about',
-      name: 'about',
-      // route level code-splitting
-      // this generates a separate chunk (about.[hash].js) for this route
-      // which is lazy-loaded when the route is visited.
-      component: () => import(/* webpackChunkName: "about" */ './views/About.vue')
+    }, {
+      path: '/soldout',
+      name: 'soldout',
+      component: SoldOut
+    }, {
+      path: '/schedule',
+      name: 'schedule',
+      component: OfficialSchedule
+    }, {
+      path: '/signin',
+      name: 'signin',
+      component: SignIn
+    }, {
+      path: '*',
+      name: 'notfound',
+      component: NotFound
     }
   ]
 })
+router.beforeEach((to, from, next) => {
+  console.debug('router.beforeEach start')
+
+  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
+  if (requiresAuth) {
+    // このルートはログインされているかどうか認証が必要です。
+    // もしされていないならば、ログインページにリダイレクトします。
+    const signnedIn = store.getters.signnedIn
+    if (signnedIn) {
+      next()
+    } else {
+      next({
+        path: '/signin'
+      })
+    }
+  } else {
+    next() // next() を常に呼び出すようにしてください!
+  }
+})
+export default router

@@ -1,0 +1,66 @@
+@import "../node_modules/bulma/bulma.sass";
+@import "../node_modules/firebaseui-ja/dist/firebaseui.css";
+
+$card-header-background-color: #ffe0eb;
+
+@import "../node_modules/bulma/sass/components/card.sass";
+
+.bk-coler-nogi {
+  background-color: #fcf;
+}
+
+.bk-coler-keyaki {
+  background-color: #cfc;
+}
+
+.bk-coler-yoshimoto {
+  background-color: #fcc;
+}
+
+.bk-coler-hinata {
+  background-color: #cff;
+}
+
+.bk-coler-zenkoku {
+  background-color: #7fbfff;
+}
+
+.bk-coler-kobetsu {
+  background-color: #ffff7f;
+}
+
+.bk-coler-miyagi {
+  background-color: #ffcce5;
+}
+
+.bk-coler-chiba {
+  background-color: #e5ccff;
+}
+
+.bk-coler-tokyo {
+  background-color: #ccf;
+}
+
+.bk-coler-kanagawa {
+  background-color: #cce5ff;
+}
+
+.bk-coler-aichi {
+  background-color: #ccffe5;
+}
+
+.bk-coler-kyoto {
+  background-color: #e5ffcc;
+}
+
+.bk-coler-osaka {
+  background-color: #ffc;
+}
+
+.bk-coler-kanto {
+  background-color: #ff7fbf;
+}
+
+.bk-coler-kansai {
+  background-color: #ff7fbf;
+}
