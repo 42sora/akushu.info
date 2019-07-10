@@ -52,7 +52,7 @@
         </template>
       </flip-transition-tr>
       <tr
-        v-for="body in memberBody"
+        v-for="(body,i) in memberBody"
         :key="body.name"
       >
         <th
@@ -69,17 +69,25 @@
         >
           {{ dTotal(body.soldOut,body.total) }}
         </td>
-        <template v-for="(status,i) in body.status">
+        <template v-for="(status,j) in body.status">
           <td
-            v-for="(state,j) in status"
-            :key="body.name+eventHeader[i].date+j"
+            v-for="(state,k) in status"
+            :key="body.name+eventHeader[j].date+k"
             :class="{
-              'part-end':j+1===status.length,
+              'part-end':k+1===status.length,
               'is-sold-out':status.every(state => state !== '*')&&!status.every(state => state === '-'),
               'is-lastest':state===currentOrder-1
             }"
           >
             {{ dState(state) }}
+            <span class="tooltip">
+              <span
+                class="text"
+                :class="getTooltipClass(i,j)"
+              >
+                {{ dName(body.name)+" "+eventHeader[j].prefecture+"："+eventHeader[j].parts[k] }}
+              </span>
+            </span>
           </td>
         </template>
       </tr>
@@ -149,6 +157,7 @@ export default {
           return {
             date: cutDate(event.eventDetail),
             place: event.eventDetail.split('・').pop(),
+            prefecture: event.eventDetail.split(/[)）]/).pop().split('・').shift(),
             parts: event.tickets.map(ticket => ticket.partName).filter(unique),
             isSelected: this.selectedDate.includes(cutDate(event.eventDetail))
           }
@@ -230,6 +239,16 @@ export default {
       } else {
         return displayNumberMap[state]
       }
+    },
+    getTooltipClass (memberIndex, statusIndex) {
+      const memberLength = this.memberBody.length
+      const statusLength = this.memberBody[memberIndex].status.length
+      return {
+        top: memberIndex + 1 > memberLength / 2,
+        bottom: memberIndex + 1 <= memberLength / 2,
+        left: statusIndex + 1 > statusLength / 2,
+        right: statusIndex + 1 <= statusLength / 2
+      }
     }
   }
 }
@@ -275,6 +294,46 @@ table {
     td {
       padding: 2px 0;
       border-width: 0 2px 1px 0;
+      position: relative;
+
+      .tooltip .text {
+        white-space: nowrap;
+        padding: 5px 10px;
+        border-radius: 10px;
+        color: white;
+        background-color: black;
+        visibility: hidden;
+        opacity: 0;
+        z-index: 2;
+        position: absolute;
+
+        &.top {
+          bottom: 70%;
+        }
+
+        &.bottom {
+          top: 70%;
+        }
+
+        &.right {
+          left: 70%;
+        }
+
+        &.left {
+          right: 70%;
+        }
+      }
+
+      &:hover {
+        color: white;
+        background-color: #1f91ff;
+
+        .tooltip .text {
+          visibility: visible;
+          opacity: 0.8;
+          transition: opacity 800ms cubic-bezier(1, 0, 0.5, 0);
+        }
+      }
     }
 
     &:last-child {
