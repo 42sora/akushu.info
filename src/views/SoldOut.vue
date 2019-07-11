@@ -1,7 +1,7 @@
 <template>
   <div class="container">
     <div
-      v-for="soldOut in soldOutList"
+      v-for="soldOut in sliced"
       :key="soldOut.goodsName"
       class="card"
     >
@@ -29,12 +29,35 @@ import SoldOutTable from '@/components/SoldOutTable.vue'
 export default {
   name: 'SoldOut',
   components: { SoldOutTable },
+  data () {
+    return {
+      displayLength: 0
+    }
+  },
   computed: {
     soldOutList () {
       return this.$store.getters.soldOutList
+    },
+    sliced () {
+      return this.soldOutList.slice(0, this.displayLength)
     }
   },
+  mounted () {
+    setTimeout(() => {
+      this.updatedTable()
+    }, 0)
+  },
+  updated () {
+    setTimeout(() => {
+      this.updatedTable()
+    }, 0)
+  },
   methods: {
+    updatedTable () {
+      if (this.displayLength < this.soldOutList.length) {
+        this.displayLength++
+      }
+    },
     getTitle (eventName) {
       return eventName.split('】')[1].split('発売記念')[0]
     },
