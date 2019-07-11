@@ -35,7 +35,10 @@ const router = new Router({
       name: 'notfound',
       component: NotFound
     }
-  ]
+  ],
+  scrollBehavior (to, from, savedPosition) {
+    return { x: 0, y: 0 }
+  }
 })
 router.beforeEach((to, from, next) => {
   console.debug('router.beforeEach start')
