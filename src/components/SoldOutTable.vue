@@ -293,17 +293,15 @@ table {
 
     td {
       border-width: 0 2px 1px 0;
-      padding: 1px 0;
+      padding: 1px 0 3px 0;
       position: relative;
 
       .tooltip .text {
-        background-color: black;
+        background-color: rgba(0, 0, 0, 0.8);
         border-radius: 10px;
-        color: white;
-        opacity: 0;
+        display: none;
         padding: 5px 10px;
         position: absolute;
-        visibility: hidden;
         white-space: nowrap;
         z-index: 2;
 
@@ -329,9 +327,22 @@ table {
         color: white;
 
         .tooltip .text {
-          opacity: 0.8;
-          transition: opacity 800ms cubic-bezier(1, 0, 0.5, 0);
-          visibility: visible;
+          @keyframes fade-in {
+            0% {
+              opacity: 0;
+            }
+
+            100% {
+              opacity: 1;
+            }
+          }
+
+          animation-delay: 400ms;
+          animation-duration: 400ms;
+          animation-fill-mode: both;
+          animation-name: fade-in;
+          animation-timing-function: ease-out;
+          display: block;
         }
       }
     }
