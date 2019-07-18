@@ -10,7 +10,7 @@
       >
         <header
           class="card-header"
-          :class="getTitleClass(soldOut.goodsName)"
+          :class="getBkColerClass(soldOut.goodsName)"
         >
           <p class="card-header-title">
             {{ getTitle(soldOut.goodsName) }}
@@ -34,6 +34,7 @@
   </div>
 </template>
 <script>
+import { getBkColerClass } from '@/utils/StyleUtil'
 import SoldOutTable from '@/components/SoldOutTable.vue'
 export default {
   name: 'SoldOut',
@@ -67,14 +68,7 @@ export default {
     getTitle (eventName) {
       return eventName.split('】')[1].split('発売記念')[0]
     },
-    getTitleClass (eventName) {
-      return {
-        'bk-coler-nogi': eventName.includes('乃木坂'),
-        'bk-coler-keyaki': eventName.includes('欅坂'),
-        'bk-coler-yoshimoto': eventName.includes('吉本坂'),
-        'bk-coler-hinata': eventName.includes('日向坂')
-      }
-    }
+    getBkColerClass
   }
 }
 </script>
