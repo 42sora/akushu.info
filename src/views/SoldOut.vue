@@ -1,27 +1,36 @@
 <template>
   <div class="container">
-    <div
-      v-for="soldOut in sliced"
-      :key="soldOut.goodsName"
-      class="card"
+    <template
+      v-for="(soldOut,i) in soldOutList"
     >
-      <header
-        class="card-header"
-        :class="getTitleClass(soldOut.goodsName)"
+      <div
+        v-if="i<currentDisplayLength"
+        :key="soldOut.goodsName"
+        class="card"
       >
-        <p class="card-header-title">
-          {{ getTitle(soldOut.goodsName) }}
-        </p>
-      </header>
-      <div class="card-content">
-        <div class="table-wrapper">
-          <sold-out-table
-            :event-name="soldOut.goodsName"
-            :events="soldOut.events"
-          />
+        <header
+          class="card-header"
+          :class="getTitleClass(soldOut.goodsName)"
+        >
+          <p class="card-header-title">
+            {{ getTitle(soldOut.goodsName) }}
+          </p>
+        </header>
+        <div class="card-content">
+          <div class="table-wrapper">
+            <sold-out-table
+              :event-name="soldOut.goodsName"
+              :events="soldOut.events"
+            />
+          </div>
         </div>
       </div>
-    </div>
+      <div
+        v-else
+        :key="i"
+        class="dummy"
+      />
+    </template>
   </div>
 </template>
 <script>
@@ -31,31 +40,28 @@ export default {
   components: { SoldOutTable },
   data () {
     return {
-      displayLength: 0
+      currentDisplayLength: 0
     }
   },
   computed: {
     soldOutList () {
       return this.$store.getters.soldOutList
-    },
-    sliced () {
-      return this.soldOutList.slice(0, this.displayLength)
     }
   },
   mounted () {
     setTimeout(() => {
-      this.updatedTable()
+      this.extendDisplayLength()
     }, 0)
   },
   updated () {
     setTimeout(() => {
-      this.updatedTable()
+      this.extendDisplayLength()
     }, 0)
   },
   methods: {
-    updatedTable () {
-      if (this.displayLength < this.soldOutList.length) {
-        this.displayLength++
+    extendDisplayLength () {
+      if (this.currentDisplayLength < this.soldOutList.length) {
+        this.currentDisplayLength++
       }
     },
     getTitle (eventName) {
@@ -88,5 +94,9 @@ export default {
 
 .table-wrapper {
   overflow-x: auto;
+}
+
+.dummy {
+  height: 900px;
 }
 </style>
