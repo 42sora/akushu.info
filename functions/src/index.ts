@@ -252,7 +252,7 @@ export const registerMaster = functions
     const body: registerMasterParam = request.body
     console.log(body);
 
-    const authKey = functions.config().fortune.auth.key
+    const authKey = functions.config().auth.key
     if (body.authKey !== authKey) {
       response.status(400).send({ message: "auth failed" })
       return
