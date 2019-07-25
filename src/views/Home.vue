@@ -78,7 +78,7 @@
   </div>
 </template>
 <script>
-import { isPast } from '@/utils/DateStrComparer'
+import { isPast } from '@/utils/DateUtil'
 import { unique } from '@/utils/ArrayUtil'
 import AkuCard from '@/components/AkuCard'
 import FortuneLoginForm from '@/components/FortuneLoginForm'

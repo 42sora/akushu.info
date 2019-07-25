@@ -3,7 +3,7 @@ import Vuex from 'vuex'
 import firebase from 'firebase'
 import { firestore } from './firebaseConfig'
 import { aggregateEntry } from './utils/FortuneAggregator'
-import { compareDateStr } from './utils/DateStrComparer'
+import { compareDateStr } from './utils/DateUtil'
 
 Vue.use(Vuex)
 
