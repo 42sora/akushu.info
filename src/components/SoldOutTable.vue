@@ -96,6 +96,7 @@
 </template>
 <script>
 import { unique } from '@/utils/ArrayUtil'
+import { compareDateStr, format } from '@/utils/DateUtil'
 import FlipTransitionTr from '@/components/transitions/FlipTransitionTr'
 import FlipTransitionTbody from '@/components/transitions/FlipTransitionTbody'
 const displayPartMap = {
@@ -131,7 +132,6 @@ const displayNumberMap = {
   19: '⓳',
   20: '⓴'
 }
-const toInt = str => parseInt(str.replace(/[^0-9^.]/g, ''), 10)
 const cutDate = str => /[0-9]+月[0-9]+日/.exec(str)[0]
 const padding = num => num.toString().padStart(2, '0')
 export default {
@@ -148,8 +148,9 @@ export default {
   },
   computed: {
     sortedEvents () {
-      return this.events.slice()
-        .sort((a, b) => this.isSelectedDate(b.eventDetail) - this.isSelectedDate(a.eventDetail) || toInt(a.eventDetail) - toInt(b.eventDetail))
+      const selected = (a, b) => this.isSelectedDate(b.eventDetail) - this.isSelectedDate(a.eventDetail)
+      const dateOrder = (a, b) => compareDateStr(format(a.eventDetail), format(b.eventDetail))
+      return this.events.slice().sort((a, b) => selected(a, b) || dateOrder(a, b))
     },
     eventHeader () {
       return this.sortedEvents
