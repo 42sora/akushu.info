@@ -1,6 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import firebase from 'firebase'
+import firebase from 'firebase/app'
 import { firestore } from './firebaseConfig'
 import { aggregateEntry } from './utils/FortuneAggregator'
 import { compareDateStr } from './utils/DateUtil'

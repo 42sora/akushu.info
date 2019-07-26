@@ -8,7 +8,7 @@
 </template>
 
 <script>
-import firebase from 'firebase'
+import firebase from 'firebase/app'
 import firebaseui from 'firebaseui-ja'
 
 export default {
