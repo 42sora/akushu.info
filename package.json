@@ -5,7 +5,7 @@
   "scripts": {
     "serve": "vue-cli-service serve",
     "servefun": "npm --prefix ./functions run serve",
-    "build": "vue-cli-service build",
+    "build": "vue-cli-service build --modern",
     "lint": "vue-cli-service lint",
     "lintcss": "stylelint \"**/*.vue\" \"**/*.css\" \"**/*.scss\"",
     "fixcss": "stylelint \"**/*.vue\" \"**/*.css\" \"**/*.scss\" --fix",
