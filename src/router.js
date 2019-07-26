@@ -5,7 +5,6 @@ import Home from './views/Home.vue'
 import SoldOut from './views/SoldOut.vue'
 import OfficialSchedule from './views/OfficialSchedule.vue'
 import NotFound from './views/NotFound.vue'
-import SignIn from './views/SignIn.vue'
 
 Vue.use(Router)
 
@@ -29,7 +28,7 @@ const router = new Router({
     }, {
       path: '/signin',
       name: 'signin',
-      component: SignIn
+      component: () => import(/* webpackChunkName: "signin" */'./views/SignIn')
     }, {
       path: '*',
       name: 'notfound',
