@@ -7,6 +7,7 @@ import './firebaseConfig'
 import './fortawesomeConfig'
 
 Vue.config.productionTip = false
+Vue.config.performance = process.env.NODE_ENV !== 'production'
 
 new Vue({
   router,
