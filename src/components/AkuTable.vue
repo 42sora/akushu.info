@@ -39,7 +39,7 @@
 </template>
 
 <script>
-import { unique } from '@/utils/ArrayUtil'
+import { unique, total } from '@/utils/ArrayUtil'
 export default {
   props: {
     tickets: { type: Array, required: true }
@@ -76,7 +76,7 @@ export default {
       }
 
       const ifNotNumThenZero = x => typeof x !== 'number' ? 0 : x
-      const compareTotal = (a, b) => a.reduce((total, v) => total + v, 0) - b.reduce((total, v) => total + v, 0) || compareEach(a, b, 1)
+      const compareTotal = (a, b) => a.reduce(total()) - b.reduce(total()) || compareEach(a, b, 1)
       const compareEach = (a, b, i) => a.length - 1 === i ? 0 : a[i] - b[i] || compareEach(a, b, i + 1)
       const compare = (a, b) => compareTotal(a.map(ifNotNumThenZero), b.map(ifNotNumThenZero)) || compareEach(a.map(ifNotNumThenZero), b.map(ifNotNumThenZero), 1)
 

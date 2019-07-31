@@ -91,7 +91,7 @@
   </table>
 </template>
 <script>
-import { unique } from '@/utils/ArrayUtil'
+import { unique, count, total } from '@/utils/ArrayUtil'
 import { compareDateStr, format } from '@/utils/DateUtil'
 import FlipTransitionTr from '@/components/transitions/FlipTransitionTr'
 import FlipTransitionTbody from '@/components/transitions/FlipTransitionTbody'
@@ -143,7 +143,7 @@ const toDisplayState = state => {
 const sumAllStatus = status =>
   status.flat()
     .map(it => it.state)
-    .reduce((total, state) => typeof state === 'number' ? total + state : total, 0)
+    .reduce(total(state => typeof state === 'number'))
 
 export default {
   components: { FlipTransitionTr, FlipTransitionTbody },
@@ -194,8 +194,8 @@ export default {
                 .filter(ticket => ticket.memberName === member)
                 .map(ticket => ticket.state))
             .map((status, index) => status.length === 0 ? this.allNone[index] : status)
-          const soldOut = statusList.flat().reduce((total, state) => typeof state === 'number' ? ++total : total, 0)
-          const total = statusList.flat().reduce((total, state) => state !== '-' ? ++total : total, 0)
+          const soldOut = statusList.flat().reduce(count(state => typeof state === 'number'), 0)
+          const total = statusList.flat().reduce(count(state => state !== '-'), 0)
           return {
             name: toDisplayName(member),
             status: statusList.map((status, i) => {
@@ -211,7 +211,7 @@ export default {
                     'is-lastest': state === currentOrder - 1
                   },
                   tooltip: {
-                    text: toDisplayName(member) + ' ' + header.prefecture + '：' + header.parts[j].fullName,
+                    text: `${toDisplayName(member)} ${header.prefecture}：${header.parts[j].fullName}`,
                     class: [
                       memberIndex > body.length / 2 ? 'top' : 'bottom',
                       i > status.length / 2 ? 'left' : 'right'
