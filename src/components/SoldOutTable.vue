@@ -141,7 +141,10 @@ const toDisplayState = state => {
   }
 }
 const sumAllStatus = status =>
-  status.flat().reduce((total, state) => typeof state === 'number' ? total + state : total, 0)
+  status.flat()
+    .map(it => it.state)
+    .reduce((total, state) => typeof state === 'number' ? total + state : total, 0)
+
 export default {
   components: { FlipTransitionTr, FlipTransitionTbody },
   props: {
@@ -200,6 +203,7 @@ export default {
               const isSoldOut = status.every(state => state !== '*') && !status.every(state => state === '-')
               const ret = status.map((state, j) => {
                 return {
+                  state: state,
                   displayState: toDisplayState(state),
                   class: {
                     'part-end': j + 1 === status.length,
