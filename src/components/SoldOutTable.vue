@@ -143,7 +143,8 @@ const toDisplayState = state => {
 const sumAllStatus = status =>
   status.flat()
     .map(it => it.state)
-    .reduce(total(state => typeof state === 'number'))
+    .filter(state => typeof state === 'number')
+    .reduce(total, 0)
 
 export default {
   components: { FlipTransitionTr, FlipTransitionTbody },
