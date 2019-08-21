@@ -173,6 +173,10 @@ export const subFortune = functions
     }
   })
 
+interface ScrapingReslut {
+  message: string
+  url: string
+}
 export const scrapingGoodsList = functions
   .region(REGION)
   .runWith({
@@ -186,6 +190,7 @@ export const scrapingGoodsList = functions
 
     const promises: Promise<any>[] = []
 
+    const resluts: Array<ScrapingReslut> = []
     for (const config of access) {
       const page = await getNewPage()
 
@@ -197,18 +202,19 @@ export const scrapingGoodsList = functions
       const url = await fortune.getGoodsPageUrl(page, config.url)
       console.log(url);
       if (url === null) {
-        response.status(200).send({ message: "goods page not found", url })
-        return
+        resluts.push({ message: "goods page not found", url: config.url })
+        continue
       }
       const res = await fortune.getGoodsList(page, url)
       console.log(JSON.stringify(res, undefined, 1))
       promises.push(db.collection("public").doc("goodsList").update({
         [config.goodsName]: admin.firestore.FieldValue.arrayUnion(res)
       }))
+      resluts.push({ message: "success", url: config.url })
     }
 
     await Promise.all(promises)
-    response.status(200).send({ message: "success", access })
+    response.status(200).send({ resluts, access })
   })
 
 export const aggregateGoodsList = functions
