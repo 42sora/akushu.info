@@ -47,7 +47,7 @@ const store = new Vuex.Store({
     }
   },
   getters: {
-    signnedIn: state => state.auth.uid !== null,
+    signnedIn: state => state.auth !== null && state.auth.uid !== null,
     myEventList: state => {
       const entryList = state.user.fortune.entryList
       if (!entryList) return []

@@ -1,48 +1,97 @@
 <template>
-  <div class="SignIn">
-    <div id="firebaseui-auth-container" />
-    <div v-show="isLoading">
-      Loading...
+  <div>
+    <progress
+      v-if="isRedirect"
+      class="progress is-primary"
+      max="100"
+    />
+    <div
+      v-else
+      class="container"
+    >
+      <div
+        class="has-text-centered"
+      >
+        <button
+          class="google button is-medium is-fullwidth is-primary"
+          @click="googleLogin"
+        >
+          <span class="icon is-large">
+            <font-awesome-icon :icon="['fab','google']" />
+          </span>
+          <span>
+            Google でログイン
+          </span>
+        </button>
+        <button
+          class="twitter button is-medium is-fullwidth is-primary"
+          @click="twitterLogin"
+        >
+          <span class="icon is-large">
+            <font-awesome-icon :icon="['fab','twitter']" />
+          </span>
+          <span>
+            Twitter でログイン
+          </span>
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
 import firebase from 'firebase/app'
-import firebaseui from 'firebaseui-ja'
 
 export default {
   name: 'SignIn',
   components: { },
   data: function () {
-    return { isLoading: true }
+    return { isRedirect: false }
   },
-  mounted () {
-    let ui = firebaseui.auth.AuthUI.getInstance()
-    if (!ui) { ui = new firebaseui.auth.AuthUI(this.$auth) }
-    ui.start('#firebaseui-auth-container', {
-      callbacks: {
-        signInSuccessWithAuthResult: (authResult, redirectUrl) => {
+  created () {
+    this.isRedirect = sessionStorage.getItem('isRedirect')
+    sessionStorage.removeItem('isRedirect')
+
+    if (this.isRedirect) {
+      this.$auth.getRedirectResult().then(authResult => {
+        console.debug(authResult)
+        if (authResult.user !== null) {
           this.$store.dispatch('signIn', authResult.user)
           this.$router.push('/')
-          return false
-        },
-        uiShown: () => {
-          this.isLoading = false
+        } else {
+          this.isRedirect = false
         }
-      },
-      signInFlow: 'redirect',
-      signInOptions: [
-        firebase.auth.GoogleAuthProvider.PROVIDER_ID,
-        firebase.auth.TwitterAuthProvider.PROVIDER_ID,
-        firebaseui.auth.AnonymousAuthProvider.PROVIDER_ID
-      ],
-      tosUrl: '<your-tos-url>',
-      privacyPolicyUrl: '<your-privacy-policy-url>'
-    })
+      })
+    }
+  },
+  methods: {
+    async googleLogin () {
+      const provider = new firebase.auth.GoogleAuthProvider()
+      this.login(provider)
+    },
+    async twitterLogin () {
+      const provider = new firebase.auth.TwitterAuthProvider()
+      this.login(provider)
+    },
+    login (provider) {
+      sessionStorage.setItem('isRedirect', true)
+      this.$auth.signInWithRedirect(provider)
+    }
   }
 }
 </script>
-<style scoped>
-@import "../../node_modules/firebaseui-ja/dist/firebaseui.css";
+<style lang="scss" scoped>
+.button {
+  &.google {
+    background-color: #4285f4;
+  }
+
+  &.twitter {
+    background-color: #55acee;
+  }
+
+  + .button {
+    margin-top: 24px;
+  }
+}
 </style>
