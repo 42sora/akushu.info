@@ -4,6 +4,7 @@ import store from './store'
 import Home from './views/Home.vue'
 import SoldOut from './views/SoldOut.vue'
 import OfficialSchedule from './views/OfficialSchedule.vue'
+import Share from './views/Share.vue'
 import NotFound from './views/NotFound.vue'
 
 Vue.use(Router)
@@ -29,6 +30,10 @@ const router = new Router({
       path: '/signin',
       name: 'signin',
       component: () => import(/* webpackChunkName: "signin" */'./views/SignIn')
+    }, {
+      path: '/share',
+      name: 'share',
+      component: Share
     }, {
       path: '*',
       name: 'notfound',
