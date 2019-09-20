@@ -30,7 +30,7 @@ export default {
   },
   methods: {
     async share () {
-      const key = 'AIzaSyC7mXiEBkW87jn4B2MZOzq846AaGWpUaVs'
+      const key = process.env.VUE_APP_API_KEY
       const url = `https://akushu.info/share?q=${JSON.stringify(this.event)}`
 
       const responce = await fetch(`https://firebasedynamiclinks.googleapis.com/v1/shortLinks?key=${key}`,

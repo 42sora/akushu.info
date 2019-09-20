@@ -6,7 +6,7 @@ import 'firebase/functions'
 import 'firebase/performance'
 
 const config = {
-  apiKey: 'AIzaSyC7mXiEBkW87jn4B2MZOzq846AaGWpUaVs',
+  apiKey: process.env.VUE_APP_API_KEY,
   authDomain: 'akuu-37e4b.firebaseapp.com',
   databaseURL: 'https://akuu-37e4b.firebaseio.com',
   projectId: 'akuu-37e4b',
