@@ -7,13 +7,13 @@
           colspan="2"
         />
         <th
-          v-for="header in eventHeader"
+          v-for="header in sortedHeader"
           :key="header.date"
           :colspan="header.parts.length"
-          :class="{'is-selected-header':header.isSelected}"
+          :class="{'is-selected-header':isSelectedDate(header.date)}"
           @click="tapHeader(header.date)"
         >
-          {{ header.date }}
+          {{ header.displayDate }}
         </th>
       </flip-transition-tr>
       <flip-transition-tr>
@@ -22,10 +22,10 @@
           colspan="2"
         />
         <th
-          v-for="header in eventHeader"
+          v-for="header in sortedHeader"
           :key="header.date"
           :colspan="header.parts.length"
-          :class="{'is-selected-header':header.isSelected}"
+          :class="{'is-selected-header':isSelectedDate(header.date)}"
           @click="tapHeader(header.date)"
         >
           {{ header.place }}
@@ -41,51 +41,47 @@
         <th :key="'part-header-2'">
           合計
         </th>
-        <template v-for="header in eventHeader">
+        <template v-for="header in sortedHeader">
           <th
-            v-for="(part,i) in header.parts"
-            :key="header.date + part"
-            :class="{'part-end':i+1===header.parts.length}"
+            v-for="part in header.parts"
+            :key="header.date + part.fullName"
+            :class="part.class"
           >
-            {{ dPart(part) }}
+            {{ part.shortName }}
           </th>
         </template>
       </flip-transition-tr>
       <tr
-        v-for="(body,i) in memberBody"
-        :key="body.name"
+        v-for="row in sortedBody"
+        :key="row.name"
       >
         <th
-          :key="body.name+'-name'"
+          :key="row.name+'-name'"
           class="sticky"
-          :class="{'is-selected-member':body.isSelected}"
-          @click="tapMemberName(body.name)"
+          :class="{'is-selected-member':isSelectedMember(row.name)}"
+          @click="tapMemberName(row.name)"
         >
-          {{ dName(body.name) }}
+          {{ row.name }}
         </th>
         <td
-          :key="body.name+'-total'"
-          :class="{'is-sold-out':body.soldOut===body.total}"
+          :key="row.name+'-progress'"
+          :class="{'is-sold-out':row.isSoldOut}"
         >
-          {{ dTotal(body.soldOut,body.total) }}
+          {{ row.progress }}
         </td>
-        <template v-for="(status,j) in body.status">
+        <template v-for="(status,i) in row.status">
           <td
-            v-for="(state,k) in status"
-            :key="body.name+eventHeader[j].date+k"
-            :class="{
-              'part-end':k+1===status.length,
-              'is-sold-out':status.every(state => state !== '*')&&!status.every(state => state === '-'),
-              'is-lastest':state===currentOrder-1
-            }"
+            v-for="(state,j) in status"
+            :key="row.name+i+j"
+            :class="state.class"
           >
-            {{ dState(state) }}
+            {{ state.displayState }}
             <span class="tooltip">
               <span
                 class="text"
-                :class="getTooltipClass(i,j)"
+                :class="state.tooltip.class"
               >
-                {{ dName(body.name)+" "+eventHeader[j].prefecture+"："+eventHeader[j].parts[k] }}
+                {{ state.tooltip.text }}
               </span>
             </span>
           </td>
@@ -95,45 +91,61 @@
   </table>
 </template>
 <script>
-import { unique } from '@/utils/ArrayUtil'
+import { unique, count, total } from '@/utils/ArrayUtil'
+import { compareDateStr, format } from '@/utils/DateUtil'
 import FlipTransitionTr from '@/components/transitions/FlipTransitionTr'
 import FlipTransitionTbody from '@/components/transitions/FlipTransitionTbody'
-const displayPartMap = {
-  '１部': 1,
-  '２部': 2,
-  '３部': 3,
-  '４部': 4,
-  '５部': 5,
-  '６部': 6,
-  '７部': 7,
-  '８部': 8,
-  '９部': 9
+const toDisplayDate = str => /[0-9]+月[0-9]+日/.exec(str)[0]
+const toDisplayPart = part => {
+  switch (part) {
+    case '１部':case '第１部': return 1
+    case '２部':case '第２部': return 2
+    case '３部':case '第３部': return 3
+    case '４部':case '第４部': return 4
+    case '５部':case '第５部': return 5
+    case '６部':case '第６部': return 6
+    case '７部':case '第７部': return 7
+    case '８部':case '第８部': return 8
+    case '９部':case '第９部': return 9
+    default: return part
+  }
 }
-const displayNumberMap = {
-  1: '❶',
-  2: '❷',
-  3: '❸',
-  4: '❹',
-  5: '❺',
-  6: '❻',
-  7: '❼',
-  8: '❽',
-  9: '❾',
-  10: '❿',
-  11: '⓫',
-  12: '⓬',
-  13: '⓭',
-  14: '⓮',
-  15: '⓯',
-  16: '⓰',
-  17: '⓱',
-  18: '⓲',
-  19: '⓳',
-  20: '⓴'
-}
-const toInt = str => parseInt(str.replace(/[^0-9^.]/g, ''), 10)
-const cutDate = str => /[0-9]+月[0-9]+日/.exec(str)[0]
+const toDisplayName = name => name.replace(/\s+/g, '')
 const padding = num => num.toString().padStart(2, '0')
+const toDisplayProgress = (soldOut, total) => padding(soldOut) + '/' + padding(total)
+const toDisplayState = state => {
+  switch (state) {
+    case '-': return '―'
+    case '*': return '◯'
+    case 1:return '❶'
+    case 2:return '❷'
+    case 3:return '❸'
+    case 4:return '❹'
+    case 5:return '❺'
+    case 6:return '❻'
+    case 7:return '❼'
+    case 8:return '❽'
+    case 9:return '❾'
+    case 10:return '❿'
+    case 11:return '⓫'
+    case 12:return '⓬'
+    case 13:return '⓭'
+    case 14:return '⓮'
+    case 15:return '⓯'
+    case 16:return '⓰'
+    case 17:return '⓱'
+    case 18:return '⓲'
+    case 19:return '⓳'
+    case 20:return '⓴'
+    default: return state
+  }
+}
+const sumAllStatus = status =>
+  status.flat()
+    .map(it => it.state)
+    .filter(state => typeof state === 'number')
+    .reduce(total, 0)
+
 export default {
   components: { FlipTransitionTr, FlipTransitionTbody },
   props: {
@@ -147,46 +159,89 @@ export default {
     }
   },
   computed: {
-    sortedEvents () {
-      return this.events.slice()
-        .sort((a, b) => this.isSelectedDate(b.eventDetail) - this.isSelectedDate(a.eventDetail) || toInt(a.eventDetail) - toInt(b.eventDetail))
-    },
     eventHeader () {
-      return this.sortedEvents
+      return this.events
         .map(event => {
           return {
-            date: cutDate(event.eventDetail),
+            date: format(event.eventDetail),
+            displayDate: toDisplayDate(event.eventDetail),
             place: event.eventDetail.split('・').pop(),
             prefecture: event.eventDetail.split(/[)）]/).pop().split('・').shift(),
-            parts: event.tickets.map(ticket => ticket.partName).filter(unique),
-            isSelected: this.selectedDate.includes(cutDate(event.eventDetail))
+            parts: event.tickets.map(ticket => ticket.partName).filter(unique).map((partName, i, self) => {
+              return {
+                fullName: partName,
+                shortName: toDisplayPart(partName),
+                class: { 'part-end': i + 1 === self.length }
+              }
+            })
           }
         })
     },
+    sortedHeader () {
+      const selected = (a, b) => this.isSelectedDate(b.date) - this.isSelectedDate(a.date)
+      const dateOrder = (a, b) => compareDateStr(a.date, b.date)
+      return this.eventHeader.slice().sort((a, b) => selected(a, b) || dateOrder(a, b))
+    },
     memberBody () {
-      return this.events.flatMap(event => event.tickets)
+      const currentOrder = this.currentOrder
+      return this.events
+        .flatMap(event => event.tickets)
         .map(ticket => ticket.memberName)
         .filter(unique)
-        .map(member => {
-          const status = this.sortedEvents
+        .map((member, memberIndex, body) => {
+          const statusList = this.events
             .map(event =>
               event.tickets
                 .filter(ticket => ticket.memberName === member)
                 .map(ticket => ticket.state))
-            .map((status, index) => status.length === 0 ? this.getAllNone(index) : status)
+            .map((status, index) => status.length === 0 ? this.allNone[index] : status)
+          const soldOut = statusList.flat().reduce(count(state => typeof state === 'number'), 0)
+          const total = statusList.flat().reduce(count(state => state !== '-'), 0)
           return {
-            name: member,
-            soldOut: status.flat().reduce((total, state) => typeof state === 'number' ? ++total : total, 0),
-            total: status.flat().reduce((total, state) => state !== '-' ? ++total : total, 0),
-            status: status,
-            isSelected: this.selectedMembers.includes(member)
+            name: toDisplayName(member),
+            status: statusList.map((status, i) => {
+              const header = this.eventHeader[i]
+              const isSoldOut = status.every(state => state !== '*') && !status.every(state => state === '-')
+              const ret = status.map((state, j) => {
+                return {
+                  state: state,
+                  displayState: toDisplayState(state),
+                  class: {
+                    'part-end': j + 1 === status.length,
+                    'is-sold-out': isSoldOut,
+                    'is-lastest': state === currentOrder - 1
+                  },
+                  tooltip: {
+                    text: `${toDisplayName(member)} ${header.prefecture}：${header.parts[j].fullName}`,
+                    class: [
+                      memberIndex > body.length / 2 ? 'top' : 'bottom',
+                      i > status.length / 2 ? 'left' : 'right'
+                    ]
+                  }
+                }
+              })
+              ret.header = header
+              return ret
+            }),
+            soldOut: soldOut,
+            total: total,
+            progress: toDisplayProgress(soldOut, total),
+            isSoldOut: soldOut === total
           }
         })
-        .sort((a, b) =>
-          this.selectedMembers.indexOf(b.name) - this.selectedMembers.indexOf(a.name) ||
-          b.soldOut - a.soldOut ||
-          b.total - a.total ||
-          a.status.flat().reduce((total, state) => typeof state === 'number' ? total + state : total, 0) - b.status.flat().reduce((total, state) => typeof state === 'number' ? total + state : total, 0))
+    },
+    sortedBody () {
+      const sorted = this.memberBody.slice().sort((a, b) =>
+        this.selectedMembers.indexOf(b.name) - this.selectedMembers.indexOf(a.name) ||
+        b.soldOut - a.soldOut ||
+        b.total - a.total ||
+        sumAllStatus(a.status) - sumAllStatus(b.status))
+
+      const selected = (a, b) => this.isSelectedDate(b.header.date) - this.isSelectedDate(a.header.date)
+      const dateOrder = (a, b) => compareDateStr(a.header.date, b.header.date)
+      sorted.forEach(it =>
+        it.status.sort((a, b) => selected(a, b) || dateOrder(a, b)))
+      return sorted
     },
     currentOrder () {
       const parsed = /第([0-9]+)次/.exec(this.eventName)
@@ -194,12 +249,12 @@ export default {
         return -1
       }
       return parseInt(parsed[1], 10)
+    },
+    allNone () {
+      return this.eventHeader.map(header => header.parts.map(_ => '-'))
     }
   },
   methods: {
-    getAllNone (index) {
-      return this.eventHeader[index].parts.map(_ => '-')
-    },
     tapHeader (date) {
       if (this.selectedDate.includes(date)) {
         this.selectedDate = this.selectedDate.filter(x => x !== date)
@@ -214,41 +269,11 @@ export default {
         this.selectedMembers.unshift(name)
       }
     },
-    isSelectedDate (eventDetail) {
-      return this.selectedDate.includes(cutDate(eventDetail))
+    isSelectedDate (date) {
+      return this.selectedDate.includes(date)
     },
-    dPart (part) {
-      for (const [k, v] of Object.entries(displayPartMap)) {
-        if (part.includes(k)) {
-          return v
-        }
-      }
-      return part
-    },
-    dTotal (soldOut, total) {
-      return padding(soldOut) + '/' + padding(total)
-    },
-    dName (name) {
-      return name.replace(/\s+/g, '')
-    },
-    dState (state) {
-      if (state === '-') {
-        return '―'
-      } else if (state === '*') {
-        return '◯'
-      } else {
-        return displayNumberMap[state]
-      }
-    },
-    getTooltipClass (memberIndex, statusIndex) {
-      const memberLength = this.memberBody.length
-      const statusLength = this.memberBody[memberIndex].status.length
-      return {
-        top: memberIndex + 1 > memberLength / 2,
-        bottom: memberIndex + 1 <= memberLength / 2,
-        left: statusIndex + 1 > statusLength / 2,
-        right: statusIndex + 1 <= statusLength / 2
-      }
+    isSelectedMember (name) {
+      return this.selectedMembers.includes(name)
     }
   }
 }
@@ -293,17 +318,15 @@ table {
 
     td {
       border-width: 0 2px 1px 0;
-      padding: 1px 0;
+      padding: 1px 0 3px 0;
       position: relative;
 
       .tooltip .text {
-        background-color: black;
+        background-color: rgba(0, 0, 0, 0.8);
         border-radius: 10px;
-        color: white;
-        opacity: 0;
+        display: none;
         padding: 5px 10px;
         position: absolute;
-        visibility: hidden;
         white-space: nowrap;
         z-index: 2;
 
@@ -329,9 +352,22 @@ table {
         color: white;
 
         .tooltip .text {
-          opacity: 0.8;
-          transition: opacity 800ms cubic-bezier(1, 0, 0.5, 0);
-          visibility: visible;
+          @keyframes fade-in {
+            0% {
+              opacity: 0;
+            }
+
+            100% {
+              opacity: 1;
+            }
+          }
+
+          animation-delay: 400ms;
+          animation-duration: 400ms;
+          animation-fill-mode: both;
+          animation-name: fade-in;
+          animation-timing-function: ease-out;
+          display: block;
         }
       }
     }

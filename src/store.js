@@ -1,9 +1,9 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
-import firebase from 'firebase'
+import firebase from 'firebase/app'
 import { firestore } from './firebaseConfig'
 import { aggregateEntry } from './utils/FortuneAggregator'
-import { compareDateStr } from './utils/DateStrComparer'
+import { compareDateStr } from './utils/DateUtil'
 
 Vue.use(Vuex)
 
@@ -47,7 +47,7 @@ const store = new Vuex.Store({
     }
   },
   getters: {
-    signnedIn: state => state.auth.uid !== null,
+    signnedIn: state => state.auth !== null && state.auth.uid !== null,
     myEventList: state => {
       const entryList = state.user.fortune.entryList
       if (!entryList) return []

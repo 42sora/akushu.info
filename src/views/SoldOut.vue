@@ -1,51 +1,74 @@
 <template>
   <div class="container">
-    <div
-      v-for="soldOut in soldOutList"
-      :key="soldOut.goodsName"
-      class="card"
+    <template
+      v-for="(soldOut,i) in soldOutList"
     >
-      <header
-        class="card-header"
-        :class="getTitleClass(soldOut.goodsName)"
+      <div
+        v-if="i<currentDisplayLength"
+        :key="soldOut.goodsName"
+        class="card"
       >
-        <p class="card-header-title">
-          {{ getTitle(soldOut.goodsName) }}
-        </p>
-      </header>
-      <div class="card-content">
-        <div class="table-wrapper">
-          <sold-out-table
-            :event-name="soldOut.goodsName"
-            :events="soldOut.events"
-          />
+        <header
+          class="card-header"
+          :class="getBkColerClass(soldOut.goodsName)"
+        >
+          <p class="card-header-title">
+            {{ getTitle(soldOut.goodsName) }}
+          </p>
+        </header>
+        <div class="card-content">
+          <div class="table-wrapper">
+            <sold-out-table
+              :event-name="soldOut.goodsName"
+              :events="soldOut.events"
+            />
+          </div>
         </div>
       </div>
-    </div>
+      <div
+        v-else
+        :key="i"
+        class="dummy"
+      />
+    </template>
   </div>
 </template>
 <script>
+import { getBkColerClass } from '@/utils/StyleUtil'
 import SoldOutTable from '@/components/SoldOutTable.vue'
 export default {
   name: 'SoldOut',
   components: { SoldOutTable },
+  data () {
+    return {
+      currentDisplayLength: 0
+    }
+  },
   computed: {
     soldOutList () {
       return this.$store.getters.soldOutList
     }
   },
+  mounted () {
+    setTimeout(() => {
+      this.extendDisplayLength()
+    }, 0)
+  },
+  updated () {
+    setTimeout(() => {
+      this.extendDisplayLength()
+    }, 0)
+  },
   methods: {
+    extendDisplayLength () {
+      if (this.currentDisplayLength < this.soldOutList.length) {
+        this.currentDisplayLength++
+      }
+    },
     getTitle (eventName) {
       return eventName.split('】')[1].split('発売記念')[0]
     },
-    getTitleClass (eventName) {
-      return {
-        'bk-coler-nogi': eventName.includes('乃木坂'),
-        'bk-coler-keyaki': eventName.includes('欅坂'),
-        'bk-coler-yoshimoto': eventName.includes('吉本坂'),
-        'bk-coler-hinata': eventName.includes('日向坂')
-      }
-    }
+    getBkColerClass
   }
 }
 </script>
@@ -65,5 +88,9 @@ export default {
 
 .table-wrapper {
   overflow-x: auto;
+}
+
+.dummy {
+  height: 900px;
 }
 </style>

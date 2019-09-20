@@ -1,8 +1,12 @@
 import Vue from 'vue'
-import firebase from 'firebase'
+import firebase from 'firebase/app'
+import 'firebase/auth'
+import 'firebase/firestore'
+import 'firebase/functions'
+import 'firebase/performance'
 
 const config = {
-  apiKey: 'AIzaSyC3PWmSiMDYHviFrbYDbK0aJaLSY3amEHE',
+  apiKey: process.env.VUE_APP_API_KEY,
   authDomain: 'akuu-37e4b.firebaseapp.com',
   databaseURL: 'https://akuu-37e4b.firebaseio.com',
   projectId: 'akuu-37e4b',

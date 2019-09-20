@@ -51,22 +51,12 @@
   </div>
 </template>
 <script>
+import { compareDateStr, isPast, getNowDateStr, format } from '@/utils/DateUtil'
 import ScheduleFilter from '@/components/ScheduleFilter'
 import ScheduleBox from '@/components/ScheduleBox'
 import TogglePanel from '@/components/TogglePanel'
 import ScaleDownTransitionGroup from '@/components/transitions/ScaleDownTransitionGroup'
-const toInt = str => parseInt(str.replace(/[^0-9^.]/g, ''), 10)
-const getNowYear = () => new Date().getFullYear()
-const getNowMonth = () => new Date().getMonth() + 1
-const getNowDay = () => new Date().getDate()
-
-const toYear = date => toInt(date.split('年')[0])
-const toMonth = date => toInt(date.split('年')[1].split('月')[0])
-const toDay = date => toInt(date.split('月')[1])
-const isFuture = date =>
-  toYear(date) > getNowYear() ||
-  (toYear(date) === getNowYear() && toMonth(date) > getNowMonth()) ||
-  (toYear(date) === getNowYear() && toMonth(date) === getNowMonth() && toDay(date) >= getNowDay())
+const isFuture = date => !isPast(format(date), getNowDateStr())
 
 export default {
   name: 'OfficialSchedule',
@@ -82,7 +72,7 @@ export default {
   },
   computed: {
     sorted () {
-      const compare = (a, b) => toYear(a.date) - toYear(b.date) || toMonth(a.date) - toMonth(b.date) || toDay(a.date) - toDay(b.date)
+      const compare = (a, b) => compareDateStr(format(a.date), format(b.date))
       return this.$store.state.public.officialSchedule.akushu.slice().sort(compare)
     },
     filtered () {

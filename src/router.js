@@ -4,8 +4,8 @@ import store from './store'
 import Home from './views/Home.vue'
 import SoldOut from './views/SoldOut.vue'
 import OfficialSchedule from './views/OfficialSchedule.vue'
+import Share from './views/Share.vue'
 import NotFound from './views/NotFound.vue'
-import SignIn from './views/SignIn.vue'
 
 Vue.use(Router)
 
@@ -29,13 +29,20 @@ const router = new Router({
     }, {
       path: '/signin',
       name: 'signin',
-      component: SignIn
+      component: () => import(/* webpackChunkName: "signin" */'./views/SignIn')
+    }, {
+      path: '/share',
+      name: 'share',
+      component: Share
     }, {
       path: '*',
       name: 'notfound',
       component: NotFound
     }
-  ]
+  ],
+  scrollBehavior (to, from, savedPosition) {
+    return { x: 0, y: 0 }
+  }
 })
 router.beforeEach((to, from, next) => {
   console.debug('router.beforeEach start')
